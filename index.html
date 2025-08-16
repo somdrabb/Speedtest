@@ -1,0 +1,1975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEST.de</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="48x48" href="2.png">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* ==================== */
+        /* DESIGN SYSTEM */
+        /* ==================== */
+        :root {
+            --primary: #4CAF50; /* Light green */
+            --primary-dark: #388E3C;
+            --primary-light: rgba(76, 175, 80, 0.1);
+            --secondary: #8BC34A; /* Lighter green */
+            --secondary-light: rgba(139, 195, 74, 0.1);
+            --background: #ffffff; /* White background */
+            --background-light: #f5f5f5;
+            --background-lighter: #eeeeee;
+            --card-bg: #ffffff;
+            --card-border: rgba(0, 0, 0, 0.08);
+            --text-primary: #000000; /* Black text */
+            --text-secondary: #424242;
+            --text-tertiary: #757575;
+            --success: #4CAF50;
+            --warning: #FFC107;
+            --error: #F44336;
+            --ram-color: #689F38;
+            --cpu-color: #CDDC39;
+            --gpu-color: #8BC34A;
+            --border-radius-md: 12px;
+            --border-radius-lg: 16px;
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --header-height: 80px;
+            --footer-height: 120px;
+            --transition: all 0.2s ease;
+        }
+
+        /* ==================== */
+        /* BASE STYLES */
+        /* ==================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'IBM Plex Mono', 'Courier New', monospace;
+            background-color: var(--background);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(circle at 20% 30%, var(--primary-light) 0%, transparent 20%),
+                radial-gradient(circle at 80% 70%, var(--secondary-light) 0%, transparent 20%);
+            line-height: 1.6;
+        }
+        /* ==================== */
+        /* TYPOGRAPHY */
+        /* ==================== */
+        h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            font-weight: 600;
+            position: relative;
+            display: inline-block;
+        }
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        a:hover {
+            color: var(--primary-dark);
+        }
+        /* ==================== */
+        /* LAYOUT */
+        /* ==================== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: var(--space-xl) 0;
+        }
+
+        /* ==================== */
+        /* COMPONENTS */
+        /* ==================== */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius-lg);
+            border: 1px solid var(--card-border);
+            padding: var(--space-lg);
+            transition: var(--transition);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--border-radius-md);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.2);
+        }
+
+        .badge {
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: var(--space-sm);
+        }
+
+        .badge-success {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--success);
+        }
+
+        .indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-left: var(--space-sm);
+        }
+
+        .indicator-excellent {
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success);
+        }
+
+        .indicator-good {
+            background: var(--warning);
+            box-shadow: 0 0 8px var(--warning);
+        }
+
+        .indicator-fair {
+            background: #FF9800;
+            box-shadow: 0 0 8px #FF9800;
+        }
+
+        .indicator-poor {
+            background: var(--error);
+            box-shadow: 0 0 8px var(--error);
+        }
+
+        /* ==================== */
+        /* HEADER */
+        /* ==================== */
+        header {
+            background-color: var(--background-light);
+            padding: 0 var(--space-xl);
+            border-bottom: 1px solid var(--card-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: var(--header-height);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .logo i {
+            font-size: 1.8rem;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: var(--space-lg);
+        }
+
+        nav a {
+            color: var(--text-primary);
+            font-size: 1rem;
+            padding: var(--space-sm) 0;
+            position: relative;
+        }
+
+        nav a:hover::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        /* ==================== */
+        /* SPEED TEST SECTION */
+        /* ==================== */
+        .speed-test-section {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+        }
+
+        .speedometer-container {
+            position: relative;
+            margin: 0 auto var(--space-xl);
+            width: 250px;
+            height: 250px;
+        }
+
+        .speedometer {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: transparent;
+            box-shadow: none;
+            border: transparent;
+            padding: var(--space-lg);
+        }
+
+        .speedometer-circle {
+            width: 100%;
+            height: 100%;
+            border: 6px solid var(--card-border);
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .speedometer-progress {
+            position: absolute;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            left: 0;
+            top: 0;
+            transform-origin: right center;
+            transform: rotate(0deg);
+            transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .speedometer-mask {
+            position: absolute;
+            width: 50%;
+            height: 100%;
+            background: var(--card-bg);
+            right: 0;
+            top: 0;
+            transform-origin: left center;
+            transform: rotate(0deg);
+            transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .speedometer-center {
+            position: absolute;
+            width: 76%;
+            height: 76%;
+            background: var(--card-bg);
+            border-radius: 50%;
+            top: 12%;
+            left: 12%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--card-border);
+        }
+
+        .speed-value {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .speed-unit {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .live-display {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            margin: var(--space-lg) 0 var(--space-xl);
+            gap: var(--space-sm);
+        }
+
+        .live-speed {
+            font-size: 4.5rem;
+            font-weight: 700;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .live-unit {
+            font-size: 1.8rem;
+            color: var(--text-secondary);
+        }
+
+        .control-btn {
+            background: rgba(0, 0, 0, 0.05);
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .control-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+            background: var(--primary-light);
+        }
+
+        /* ==================== */
+        /* TEST RESULTS CARD */
+        /* ==================== */
+        .results-container {
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: var(--border-radius-lg);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+        }
+
+        .results-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        .metric-value {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .metric-unit {
+            color: var(--text-secondary);
+        }
+
+        .metric-name {
+            color: var(--text-secondary);
+        }
+
+        .rating-value.excellent {
+            background: var(--primary-light);
+            color: var(--success);
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+        }
+
+        .status-badge {
+            background: var(--primary-light);
+            color: var(--success);
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+        }
+
+        .status-badge.status-ipv4 {
+            background: var(--secondary-light);
+            color: var(--secondary);
+        }
+
+        .detail-value {
+            color: var(--text-primary);
+        }
+
+        /* ==================== */
+        /* HARDWARE TESTS */
+        /* ==================== */
+        .hardware-tests {
+            display: none;
+        }
+
+        .test-selector {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .test-btn {
+            background: var(--background-light);
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--border-radius-md);
+            font-size: 1.1rem;
+            transition: var(--transition);
+        }
+
+        .test-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.2);
+        }
+
+        .test-btn.active {
+            background: var(--primary-light);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .test-container {
+            display: none;
+        }
+
+        .test-container.active {
+            display: block;
+        }
+
+        .ram-visualization {
+            width: 100%;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: var(--border-radius-md);
+            margin: var(--space-lg) 0;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+        }
+
+        .ram-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 0%;
+            background: linear-gradient(to top, var(--ram-color), #9CCC65);
+            transition: height 0.5s ease;
+        }
+
+        .ram-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--space-lg);
+            color: var(--text-secondary);
+        }
+
+        .cpu-visualization {
+            width: 100%;
+            height: 200px;
+            position: relative;
+            margin: var(--space-lg) 0;
+        }
+
+        .cpu-core {
+            position: absolute;
+            bottom: 0;
+            background: linear-gradient(to top, var(--cpu-color), #DCE775);
+            height: 0%;
+            transition: height 0.5s ease;
+        }
+
+        .cpu-core-label {
+            position: absolute;
+            bottom: -20px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .cpu-score {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--cpu-color);
+            text-align: center;
+            margin: var(--space-md) 0;
+        }
+
+        .gpu-canvas {
+            width: 100%;
+            height: 300px;
+            background: #f5f5f5;
+            border-radius: var(--border-radius-md);
+            margin: var(--space-lg) 0;
+            border: 1px solid var(--card-border);
+        }
+
+        .fps-counter {
+            font-size: 1.2rem;
+            color: var(--gpu-color);
+            text-align: center;
+            margin-bottom: var(--space-md);
+        }
+
+        .gpu-score {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--gpu-color);
+            text-align: center;
+            margin: var(--space-md) 0;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .result-label {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            color: var(--text-secondary);
+        }
+
+        .result-value {
+            font-weight: 600;
+        }
+
+        /* ==================== */
+        /* FOOTER */
+        /* ==================== */
+        footer {
+            background-color: var(--background-light);
+            padding: var(--space-xl);
+            border-top: 1px solid var(--card-border);
+            margin-top: auto;
+            position: relative;
+        }
+        .powered-by {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+}
+
+.powered-text {
+    font-size: 0.75em;
+    color: #999;
+    font-weight: normal;
+    letter-spacing: 0.5px;
+    text-transform: none;
+}
+
+.ivms-text {
+    font-size: 1.2em;
+    font-weight: normal;
+    color: #797878; /* Bright orange for visibility */
+    letter-spacing: 0.5px;
+    text-transform: none;
+}
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-xl);
+        }
+
+        .footer-section h3 {
+            color: var(--primary);
+            margin-bottom: var(--space-md);
+            font-size: 1.2rem;
+        }
+
+        .footer-section a {
+            color: var(--text-secondary);
+        }
+
+        .footer-section a:hover {
+            color: var(--primary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: var(--space-md);
+            margin-top: var(--space-md);
+        }
+
+        .social-links a {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: var(--space-xl);
+            padding-top: var(--space-md);
+            border-top: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* ==================== */
+        /* ANIMATIONS */
+        /* ==================== */
+        @keyframes speedBump {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes ramPulse {
+            0% {
+                opacity: 0.8;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes cpuBounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .speed-change {
+            animation: speedBump 0.3s ease;
+        }
+
+        .ram-pulse {
+            animation: ramPulse 1s infinite;
+        }
+
+        .cpu-bounce {
+            animation: cpuBounce 0.5s infinite;
+        }
+
+        /* ==================== */
+        /* RESPONSIVE DESIGN */
+        /* ==================== */
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--space-md);
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .speedometer-container {
+                width: 150px;
+                height: 150px;
+            }
+
+            .live-speed {
+                font-size: 3.5rem;
+            }
+
+            .live-unit {
+                font-size: 1.5rem;
+            }
+
+            .control-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+            }
+
+            .results-container {
+                width: 100%;
+                height: auto;
+            }
+
+            .metrics-grid,
+            .additional-metrics,
+            .detail-card {
+                grid-template-columns: 1fr;
+            }
+
+            .test-selector {
+                flex-direction: column;
+                gap: var(--space-sm);
+            }
+
+            .test-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .footer-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: var(--space-md) var(--space-sm);
+            }
+
+            .speedometer-container {
+                width: 220px;
+                height: 220px;
+            }
+
+            .live-speed {
+                font-size: 3rem;
+            }
+
+            .live-unit {
+                font-size: 1.3rem;
+            }
+        }
+
+        #start-again-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-size: 1.2rem;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #start-again-btn:hover {
+            background: linear-gradient(135deg, var(--primary-dark), #4CAF50);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+        }
+
+        #start-again-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <a href="#" class="logo" id="home-link">
+                <img src="2.png" alt="Speedometer" style="width:30px; height:30px; background-color: rgb(174, 247, 174); border-radius: 50px;">
+
+                <span>TEST.de</span>
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="#" id="nav-speed">Speed Test</a></li>
+                    <li><a href="#" id="nav-ram">RAM Test</a></li>
+                    <li><a href="#" id="nav-cpu">CPU Test</a></li>
+                    <li><a href="#" id="nav-gpu">GPU Test</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container" id="speed-test-section">
+            <!-- Speedometer -->
+            <div class="speedometer-container">
+                <div class="speedometer">
+                    <div class="speedometer-circle">
+                        <div class="speedometer-progress" id="progress"></div>
+                        <div class="speedometer-mask" id="mask"></div>
+                        <div class="speedometer-center">
+                            <span class="speed-value" id="speed-value">0</span>
+                            <span class="speed-unit" id="unit">Mbps</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="live-display">
+                <span class="live-speed" id="live-speed">0</span>
+                <span class="live-unit" id="live-unit">Mbps</span>
+                <button class="control-btn" id="control-btn">
+                    <i class="fas fa-play"></i>
+                </button>
+            </div>
+
+            <div class="progress-text text-center text-gray-400" id="progress-text">Ready to analyze your network</div>
+
+            <!-- Results Card -->
+            <div class="results hidden" id="results">
+                <div class="results-container rounded-2xl p-4 w-[650px] h-[370px] mx-auto overflow-y-auto">
+                    <div class="results-grid grid gap-2">
+                        <div class="speed-section">
+                            <!-- Performance Summary -->
+                            <div class="section-header mb-2">
+                                <div class="performance-summary flex items-center">
+                                    <div class="performance-rating flex items-center text-sm">
+                                        <span class="rating-label text-gray-400 mr-2">Performance:</span>
+                                        <span class="rating-value excellent">Excellent</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Metrics Grid -->
+                            <div class="metrics-grid grid grid-cols-4 gap-2 mb-3">
+                                <div class="metric-card download text-center">
+                                    <div class="metric-header flex items-center justify-center gap-1">
+                                        <i class="fas fa-download text-green-500 text-sm"></i>
+                                        <span class="metric-name text-sm">Download</span>
+                                    </div>
+                                    <div class="metric-value text-base">
+                                        <span id="download-result">0</span>
+                                        <span class="metric-unit text-xs">Mbps</span>
+                                        <span class="indicator indicator-excellent"></span>
+                                    </div>
+                                </div>
+                                <div class="metric-card upload text-center">
+                                    <div class="metric-header flex items-center justify-center gap-1">
+                                        <i class="fas fa-upload text-green-500 text-sm"></i>
+                                        <span class="metric-name text-sm">Upload</span>
+                                    </div>
+                                    <div class="metric-value text-base">
+                                        <span id="upload-result">0</span>
+                                        <span class="metric-unit text-xs">Mbps</span>
+                                        <span class="indicator indicator-good"></span>
+                                    </div>
+                                </div>
+                                <div class="metric-card ping text-center">
+                                    <div class="metric-header flex items-center justify-center gap-1">
+                                        <i class="fas fa-stopwatch text-green-500 text-sm"></i>
+                                        <span class="metric-name text-sm">Ping</span>
+                                    </div>
+                                    <div class="metric-value text-base">
+                                        <span id="ping-result">0</span>
+                                        <span class="metric-unit text-xs">ms</span>
+                                        <span class="indicator indicator-excellent"></span>
+                                    </div>
+                                </div>
+                                <div class="metric-card jitter text-center">
+                                    <div class="metric-header flex items-center justify-center gap-1">
+                                        <i class="fas fa-wave-square text-green-500 text-sm"></i>
+                                        <span class="metric-name text-sm">Jitter</span>
+                                    </div>
+                                    <div class="metric-value text-base">
+                                        <span id="jitter-result">0</span>
+                                        <span class="metric-unit text-xs">ms</span>
+                                        <span class="indicator indicator-excellent"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Additional Metrics -->
+                            <div class="additional-metrics grid grid-cols-2 gap-2 mb-3">
+                                <div class="additional-metric flex items-center justify-between">
+                                    <span class="metric-label text-sm text-gray-300">
+                                        <i class="fas fa-hourglass-half text-green-500 mr-1"></i> Load Latency
+                                    </span>
+                                    <span class="metric-value text-sm" id="load-latency-result">0 ms</span>
+                                </div>
+                                <div class="additional-metric flex items-center justify-between">
+                                    <span class="metric-label text-sm text-gray-300">
+                                        <i class="fas fa-exclamation-circle text-green-500 mr-1"></i> Packet Loss
+                                    </span>
+                                    <span class="metric-value text-sm" id="packet-loss-result">0% <span
+                                            class="badge badge-success">Excellent</span></span>
+                                </div>
+                            </div>
+
+                            <!-- Details Section -->
+                            <div class="detail-card grid grid-cols-2 gap-2 text-sm">
+                                <div class="detail-block">
+                                    <div class="detail-header flex items-center text-gray-400 gap-1">
+                                        <i class="fas fa-address-card text-green-500"></i>
+                                        <span>IP Address</span>
+                                    </div>
+                                    <div class="detail-value" id="ip-result">Loading...</div>
+                                </div>
+                                <div class="detail-block">
+                                    <div class="detail-header flex items-center text-gray-400 gap-1">
+                                        <i class="fas fa-code-branch text-green-500"></i>
+                                        <span>Type</span>
+                                    </div>
+                                    <div class="detail-value">
+                                        <span id="ip-type">Loading...</span>
+                                        <span class="badge status-ipv4"></span>
+                                    </div>
+                                </div>
+                                <div class="detail-block">
+                                    <div class="detail-header flex items-center text-gray-400 gap-1">
+                                        <i class="fas fa-plug text-green-500"></i>
+                                        <span>Connection</span>
+                                    </div>
+                                    <div class="detail-value" id="connection-type">Loading...</div>
+                                </div>
+                                <div class="detail-block">
+                                    <div class="detail-header flex items-center text-gray-400 gap-1">
+                                        <i class="fas fa-clock text-green-500"></i>
+                                        <span>Time</span>
+                                    </div>
+                                    <div class="detail-value" id="test-time">Unknown</div>
+                                </div>
+                                <div class="detail-block">
+                                    <div class="detail-header flex items-center text-gray-400 gap-1">
+                                        <i class="fas fa-server text-green-500"></i>
+                                        <span>ISP</span>
+                                    </div>
+                                    <div class="detail-value" id="isp-result">Loading...</div>
+                                </div>
+                                <div class="detail-block">
+                                    <div class="detail-header flex items-center text-gray-400 gap-1">
+                                        <i class="fas fa-map-marker-alt text-green-500"></i>
+                                        <span>Location</span>
+                                    </div>
+                                    <div class="detail-value" id="location-result">Loading...</div>
+                                </div>
+                                <div class="detail-block">
+                                    <div class="detail-header flex items-center text-gray-400 gap-1">
+                                        <i class="fas fa-cloud text-green-500"></i>
+                                        <span>Server</span>
+                                    </div>
+                                    <div class="detail-value" id="server-result">Loading...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hardware Tests Section -->
+        <div class="container hardware-tests" id="hardware-tests-section">
+            <h1>Hardware Performance Tests</h1>
+            <div class="test-selector">
+                <button class="test-btn ram-btn active" id="ram-test-btn">
+                    <i class="fas fa-memory"></i> RAM Test
+                </button>
+                <button class="test-btn cpu-btn" id="cpu-test-btn">
+                    <i class="fas fa-microchip"></i> CPU Test
+                </button>
+                <button class="test-btn gpu-btn" id="gpu-test-btn">
+                    <i class="fas fa-gamepad"></i> GPU Test
+                </button>
+            </div>
+
+            <!-- RAM Test -->
+            <div class="test-container ram-test active" id="ram-test-container">
+                <h2><i class="fas fa-memory"></i> RAM Performance Test</h2>
+                <p>Test your system's memory speed and capacity</p>
+                <div class="ram-visualization">
+                    <div class="ram-bar" id="ram-bar"></div>
+                </div>
+                <div class="ram-labels">
+                    <span>0%</span>
+                    <span id="ram-usage">0% Used</span>
+                    <span>100%</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">
+                        <i class="fas fa-tachometer-alt"></i> Memory Speed:
+                    </span>
+                    <span class="result-value ram-value" id="ram-speed">
+                        0 MB/s <span class="indicator indicator-excellent"></span>
+                    </span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">
+                        <i class="fas fa-memory"></i> Total Memory:
+                    </span>
+                    <span class="result-value ram-value" id="total-ram">
+                        Calculating...
+                    </span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">
+                        <i class="fas fa-clock"></i> Latency:
+                    </span>
+                    <span class="result-value ram-value" id="ram-latency">
+                        0 ns <span class="indicator indicator-excellent"></span>
+                    </span>
+                </div>
+                <button class="btn btn-primary start-test-btn ram-btn" id="start-ram-test">
+                    <i class="fas fa-play"></i> Start RAM Test
+                </button>
+                <div class="test-info text-gray-400 text-sm mt-md">
+                    This test measures memory read/write speed and access latency.
+                </div>
+            </div>
+
+            <!-- CPU Test -->
+            <div class="test-container cpu-test" id="cpu-test-container">
+                <h2><i class="fas fa-microchip"></i> CPU Performance Test</h2>
+                <p>Benchmark your processor's calculation power</p>
+                <div class="cpu-visualization" id="cpu-visualization"></div>
+                <div class="cpu-score" id="cpu-score">0</div>
+                <div class="result-value text-center" style="color: var(--cpu-color); margin-bottom: 20px;">
+                    Performance Score
+                </div>
+                <div class="result-item">
+                    <span class="result-label">
+                        <i class="fas fa-microchip"></i> CPU Cores:
+                    </span>
+                    <span class="result-value cpu-value" id="cpu-cores">
+                        Detecting...
+                    </span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">
+                        <i class="fas fa-clock"></i> Speed:
+                    </span>
+                    <span class="result-value cpu-value" id="cpu-speed">
+                        0 GHz
+                    </span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">
+                        <i class="fas fa-tasks"></i> Threads:
+                    </span>
+                    <span class="result-value cpu-value" id="cpu-threads">
+                        0
+                    </span>
+                </div>
+                <button class="btn btn-primary start-test-btn cpu-btn" id="start-cpu-test">
+                    <i class="fas fa-play"></i> Start CPU Test
+                </button>
+                <div class="test-info text-gray-400 text-sm mt-md">
+                    This test measures your CPU's calculation performance with complex algorithms.
+                </div>
+            </div>
+
+            <!-- GPU Test -->
+            <div class="test-container gpu-test" id="gpu-test-container">
+                <h2><i class="fas fa-gamepad"></i> GPU Performance Test</h2>
+                <p>Measure your graphics processing capabilities</p>
+                <canvas class="gpu-canvas" id="gpu-canvas"></canvas>
+                <div class="fps-counter" id="fps-counter">0 FPS</div>
+                <div class="gpu-score" id="gpu-score">0</div>
+                <div class="result-value text-center" style="color: var(--gpu-color); margin-bottom: 20px;">
+                    Performance Score
+                </div>
+                <div class="result-item">
+                    <span class="result-label">
+                        <i class="fas fa-video"></i> Renderer:
+                    </span>
+                    <span class="result-value gpu-value" id="gpu-renderer">
+                        Detecting...
+                    </span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">
+                        <i class="fas fa-tachometer-alt"></i> Performance:
+                    </span>
+                    <span class="result-value gpu-value" id="gpu-performance">
+                        <span class="indicator indicator-excellent"></span> Excellent
+                    </span>
+                </div>
+                <button class="btn btn-primary start-test-btn gpu-btn" id="start-gpu-test">
+                    <i class="fas fa-play"></i> Start GPU Test
+                </button>
+                <div class="test-info text-gray-400 text-sm mt-md">
+                    This test renders complex 3D graphics to measure your GPU's capabilities.
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>NetAnalyzer</h3>
+                <p>Advanced performance analysis tool to test your network and hardware.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#" id="footer-speed">Speed Test</a></li>
+                    <li><a href="#" id="footer-ram">RAM Test</a></li>
+                    <li><a href="#" id="footer-cpu">CPU Test</a></li>
+                    <li><a href="#" id="footer-gpu">GPU Test</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Resources</h3>
+                <ul>
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">API</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">FAQ</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Legal</h3>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Cookie Policy</a></li>
+                </ul>
+            </div>
+            <!-- Powered by text -->
+        <div class="powered-by">
+            <span class="powered-text">Product of</span>
+            <span class="ivms-text">IVMS-97</span>
+        </div>
+        </div>
+        <div class="copyright">
+            &copy; 2025 NetAnalyzer. All rights reserved.
+        </div>
+    </footer>
+    <script src="script.js" defer></script>
+
+    <script>
+        // Navigation Functionality
+        const homeLink = document.getElementById('home-link');
+        const navSpeed = document.getElementById('nav-speed');
+        const navRam = document.getElementById('nav-ram');
+        const navCpu = document.getElementById('nav-cpu');
+        const navGpu = document.getElementById('nav-gpu');
+        const footerSpeed = document.getElementById('footer-speed');
+        const footerRam = document.getElementById('footer-ram');
+        const footerCpu = document.getElementById('footer-cpu');
+        const footerGpu = document.getElementById('footer-gpu');
+        const speedTestSection = document.getElementById('speed-test-section');
+        const hardwareTestsSection = document.getElementById('hardware-tests-section');
+        const ramTestBtn = document.getElementById('ram-test-btn');
+        const cpuTestBtn = document.getElementById('cpu-test-btn');
+        const gpuTestBtn = document.getElementById('gpu-test-btn');
+        const ramTestContainer = document.getElementById('ram-test-container');
+        const cpuTestContainer = document.getElementById('cpu-test-container');
+        const gpuTestContainer = document.getElementById('gpu-test-container');
+        
+
+
+        function showSpeedTest() {
+            speedTestSection.style.display = 'block';
+            hardwareTestsSection.style.display = 'none';
+            document.title = "Network Performance Analyzer";
+        }
+
+        function showHardwareTests() {
+            speedTestSection.style.display = 'none';
+            hardwareTestsSection.style.display = 'block';
+            document.title = "Hardware Performance Tests";
+        }
+
+        function showRamTest() {
+            ramTestBtn.classList.add('active');
+            cpuTestBtn.classList.remove('active');
+            gpuTestBtn.classList.remove('active');
+            ramTestContainer.classList.add('active');
+            cpuTestContainer.classList.remove('active');
+            gpuTestContainer.classList.remove('active');
+        }
+
+        function showCpuTest() {
+            ramTestBtn.classList.remove('active');
+            cpuTestBtn.classList.add('active');
+            gpuTestBtn.classList.remove('active');
+            ramTestContainer.classList.remove('active');
+            cpuTestContainer.classList.add('active');
+            gpuTestContainer.classList.remove('active');
+        }
+
+        function showGpuTest() {
+            ramTestBtn.classList.remove('active');
+            cpuTestBtn.classList.remove('active');
+            gpuTestBtn.classList.add('active');
+            ramTestContainer.classList.remove('active');
+            cpuTestContainer.classList.remove('active');
+            gpuTestContainer.classList.add('active');
+        }
+
+        homeLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSpeedTest();
+        });
+
+        navSpeed.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSpeedTest();
+        });
+
+        navRam.addEventListener('click', (e) => {
+            e.preventDefault();
+            showHardwareTests();
+            showRamTest();
+        });
+
+        navCpu.addEventListener('click', (e) => {
+            e.preventDefault();
+            showHardwareTests();
+            showCpuTest();
+        });
+
+        navGpu.addEventListener('click', (e) => {
+            e.preventDefault();
+            showHardwareTests();
+            showGpuTest();
+        });
+
+        footerSpeed.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSpeedTest();
+        });
+
+        footerRam.addEventListener('click', (e) => {
+            e.preventDefault();
+            showHardwareTests();
+            showRamTest();
+        });
+
+        footerCpu.addEventListener('click', (e) => {
+            e.preventDefault();
+            showHardwareTests();
+            showCpuTest();
+        });
+
+        footerGpu.addEventListener('click', (e) => {
+            e.preventDefault();
+            showHardwareTests();
+            showGpuTest();
+        });
+
+        ramTestBtn.addEventListener('click', showRamTest);
+        cpuTestBtn.addEventListener('click', showCpuTest);
+        gpuTestBtn.addEventListener('click', showGpuTest);
+
+        // Initialize
+        showSpeedTest();
+        showRamTest();
+
+        // Speed Test Functionality
+        const controlBtn = document.getElementById('control-btn');
+        const liveSpeed = document.getElementById('live-speed');
+        const speedValue = document.getElementById('speed-value');
+        const unit = document.getElementById('unit');
+        const liveUnit = document.getElementById('live-unit');
+        const progress = document.getElementById('progress');
+        const mask = document.getElementById('mask');
+        const progressText = document.getElementById('progress-text');
+        const results = document.getElementById('results');
+        const downloadResult = document.getElementById('download-result');
+        const uploadResult = document.getElementById('upload-result');
+        const pingResult = document.getElementById('ping-result');
+        const jitterResult = document.getElementById('jitter-result');
+        const loadLatencyResult = document.getElementById('load-latency-result');
+        const packetLossResult = document.getElementById('packet-loss-result');
+        const ipResult = document.getElementById('ip-result');
+        const ipType = document.getElementById('ip-type');
+        const ispResult = document.getElementById('isp-result');
+        const locationResult = document.getElementById('location-result');
+        const serverResult = document.getElementById('server-result');
+        const connectionType = document.getElementById('connection-type');
+        const testTime = document.getElementById('test-time');
+
+        let testInProgress = false;
+        let downloadSpeed = 0;
+        let uploadSpeed = 0;
+        let ping = 0;
+        let jitter = 0;
+        let loadLatency = 0;
+        let packetLoss = 0;
+        let testPhase = 'idle';
+        let testStartTime;
+        let testInterval;
+        let downloadTestData = [];
+        let uploadTestData = [];
+        let pingTests = [];
+
+        updateSpeedometer(0);
+        fetchIPInfo();
+
+        if (navigator.connection) {
+            connectionType.textContent = navigator.connection.effectiveType || "Unknown";
+        } else {
+            connectionType.textContent = "Unknown";
+        }
+
+        controlBtn.addEventListener('click', toggleTest);
+
+        function toggleTest() {
+            if (testInProgress) {
+                stopTest();
+            } else {
+                startTest();
+            }
+        }
+
+        function startTest() {
+            testInProgress = true;
+            testPhase = 'ping';
+            controlBtn.innerHTML = '<i class="fas fa-stop"></i>';
+            progressText.textContent = 'Testing ping...';
+            results.classList.add('hidden');
+
+            downloadSpeed = 0;
+            uploadSpeed = 0;
+            ping = 0;
+            jitter = 0;
+            loadLatency = 0;
+            packetLoss = 0;
+            downloadTestData = [];
+            uploadTestData = [];
+            pingTests = [];
+
+            testPing();
+        }
+
+        function stopTest() {
+            testInProgress = false;
+            testPhase = 'idle';
+            controlBtn.innerHTML = '<i class="fas fa-play"></i>';
+            progressText.textContent = 'Test stopped';
+            clearInterval(testInterval);
+            updateSpeedometer(0);
+            liveSpeed.textContent = '0';
+            if (downloadSpeed > 0 || uploadSpeed > 0) {
+                showResults();
+            }
+        }
+
+
+
+
+
+        function testPing() {
+            const startTime = Date.now();
+            const simulatedLatency = Math.random() * 90 + 10;
+
+            setTimeout(() => {
+                pingTests.push(simulatedLatency);
+
+                if (pingTests.length < 5) {
+                    testPing();
+                } else {
+                    // Calculate ping & jitter
+                    ping = pingTests.reduce((a, b) => a + b, 0) / pingTests.length;
+                    const deviations = pingTests.map(t => Math.abs(t - ping));
+                    jitter = deviations.reduce((a, b) => a + b, 0) / deviations.length;
+
+                    pingResult.textContent = `${ping.toFixed(1)}`;
+                    updateQualityIndicator(pingResult, ping, [20, 50, 100], true);
+
+                    jitterResult.textContent = `${jitter.toFixed(1)}`;
+                    updateQualityIndicator(jitterResult, jitter, [5, 15, 30], true);
+
+                    // Start download test
+                    testPhase = 'download';
+                    progressText.textContent = 'Testing download speed...';
+
+                    // Create progress bar only once
+                    if (!document.getElementById('progress-bar-wrapper')) {
+                        const wrapper = document.createElement('div');
+                        wrapper.id = 'progress-bar-wrapper';
+                        wrapper.style.width = '100%';
+                        wrapper.style.display = 'flex';
+                        wrapper.style.justifyContent = 'center';
+                        wrapper.style.margin = '12px 0';
+                        wrapper.style.height = '10px';
+
+                        const container = document.createElement('div');
+                        container.id = 'progress-bar-container';
+                        container.style.width = '50%';
+                        container.style.height = '100%';
+                        container.style.background = '#e0e0e0';
+                        container.style.borderRadius = '5px';
+                        container.style.overflow = 'hidden';
+
+                        const bar = document.createElement('div');
+                        bar.id = 'progress-bar';
+                        bar.style.width = '0%';
+                        bar.style.height = '100%';
+                        bar.style.background = '#4cafef'; // blue for download
+                        bar.style.transition = 'width 0.1s linear, background 0.3s';
+
+                        container.appendChild(bar);
+                        wrapper.appendChild(container);
+                        progressText.parentNode.insertBefore(wrapper, progressText.nextSibling);
+                    }
+
+                    testDownload();
+                }
+            }, simulatedLatency);
+
+        }
+
+
+
+
+        function testDownload() {
+            testStartTime = Date.now();
+            const testDuration = 5000;
+
+            testInterval = setInterval(() => {
+                const elapsed = Date.now() - testStartTime;
+                const progress = Math.min(elapsed / testDuration, 1);
+
+                const progressBar = document.getElementById('progress-bar');
+                if (progressBar) progressBar.style.width = (progress * 100) + '%';
+
+                // Simulate download speed
+                let currentSpeed;
+                if (progress < 0.3) currentSpeed = 50 * (progress / 0.3);
+                else currentSpeed = 50 + Math.random() * 50 + Math.sin(progress * Math.PI * 4) * 20;
+
+                downloadTestData.push(currentSpeed);
+                downloadSpeed = downloadTestData.reduce((a, b) => a + b, 0) / downloadTestData.length;
+
+                updateSpeedometer(currentSpeed);
+                liveSpeed.textContent = currentSpeed.toFixed(1);
+
+                if (progress >= 1) {
+                    clearInterval(testInterval);
+
+                    downloadSpeed = calculateFinalSpeed(downloadTestData);
+                    downloadResult.textContent = `${downloadSpeed.toFixed(1)}`;
+                    updateQualityIndicator(downloadResult, downloadSpeed, [10, 25, 50], false);
+
+                    loadLatency = ping + Math.random() * 30;
+                    loadLatencyResult.textContent = `${loadLatency.toFixed(1)} ms`;
+
+                    // Start upload test
+                    testPhase = 'upload';
+                    progressText.textContent = 'Testing upload speed...';
+
+                    // Change progress bar color to green for upload
+                    const progressBarContainer = document.getElementById('progress-bar');
+                    if (progressBarContainer) progressBarContainer.style.background = '#4caf50';
+
+                    testUpload();
+                }
+            }, 100);
+
+        }
+
+        function testUpload() {
+    testStartTime = Date.now();
+    const testDuration = 5000;
+
+    testInterval = setInterval(() => {
+        const elapsed = Date.now() - testStartTime;
+        const progress = Math.min(elapsed / testDuration, 1);
+
+        const progressBar = document.getElementById('progress-bar');
+        if (progressBar) progressBar.style.width = (progress * 100) + '%';
+
+        // Simulate upload speed
+        let currentSpeed;
+        if (progress < 0.3) currentSpeed = 20 * (progress / 0.3);
+        else currentSpeed = 20 + Math.random() * 30 + Math.sin(progress * Math.PI * 4) * 10;
+
+        uploadTestData.push(currentSpeed);
+        uploadSpeed = uploadTestData.reduce((a, b) => a + b, 0) / uploadTestData.length;
+        updateSpeedometer(currentSpeed);
+
+        liveSpeed.textContent = currentSpeed.toFixed(1);
+
+        if (progress >= 1) {
+            clearInterval(testInterval);
+
+            uploadSpeed = calculateFinalSpeed(uploadTestData);
+            uploadResult.textContent = `${uploadSpeed.toFixed(1)}`;
+            updateQualityIndicator(uploadResult, uploadSpeed, [5, 15, 30], false);
+
+            // Remove progress bar after upload completes
+            const progressWrapper = document.getElementById('progress-bar-wrapper');
+            if (progressWrapper) progressWrapper.remove();
+            testComplete(); // Call testComplete instead of showResults
+        }
+    }, 100);
+}
+
+
+
+        function calculateFinalSpeed(speedData) {
+            const discardCount = Math.floor(speedData.length * 0.2);
+            const relevantData = speedData.slice(discardCount);
+            return relevantData.reduce((a, b) => a + b, 0) / relevantData.length;
+        }
+
+
+
+
+        function ipv6ToDecimal(ipv6) {
+    // Expand shorthand notation (::) for IPv6 if needed
+    const fullIp = ipv6.split("::").reduce((acc, part, i, arr) => {
+        if (arr.length === 1) return ipv6; // no ::
+        const left = part.split(":");
+        const right = arr[1].split(":");
+        const missing = 8 - (left.length + right.length);
+        return [
+            ...left,
+            ...Array(missing).fill("0"),
+            ...right
+        ].join(":");
+    }, "");
+
+    const parts = fullIp.split(":").map(h => parseInt(h, 16));
+    // Convert to a single decimal number using BigInt (IPv6 is 128-bit)
+    let decimal = BigInt(0);
+    for (let i = 0; i < parts.length; i++) {
+        decimal = decimal * BigInt(0x10000) + BigInt(parts[i]);
+    }
+    return decimal.toString(); // Return decimal string
+}
+
+function fetchIPInfo() {
+    fetch("https://api.ipify.org?format=json")
+        .then(r => r.json())
+        .then(ipData => {
+            const ip = ipData.ip;
+            const isIPv6 = ip.includes(":");
+            updateIPDisplay(ip, isIPv6);
+        })
+        .catch(err => {
+            console.error("Failed to fetch IP data:", err);
+            ipResult.textContent = "Unavailable";
+            ipType.textContent = "Unknown";
+            ispResult.textContent = "N/A";
+            locationResult.textContent = "Unknown";
+        });
+}
+
+function updateIPDisplay(ip, isIPv6) {
+    let displayIP = ip;
+    if (isIPv6) {
+        displayIP = ipv6ToDecimal(ip);
+    }
+    ipResult.textContent = displayIP;
+    ipType.textContent = isIPv6 ? "IPv6 (Decimal)" : "IPv4";
+    const ipBadge = ipType.nextElementSibling;
+    if (ipBadge) {
+        ipBadge.className = `badge ${isIPv6 ? 'status-ipv6' : 'status-ipv4'}`;
+        ipBadge.textContent = isIPv6 ? 'IPv6' : 'IPv4';
+    }
+    fetch(`https://ipapi.co/${ip}/json/`)
+        .then(r => r.json())
+        .then(data => {
+            ispResult.textContent = data.org || "N/A";
+            locationResult.textContent = `${data.city || "Unknown"}, ${data.country_name || "Unknown"}`;
+        })
+        .catch(err => console.error("Failed to fetch location data:", err));
+}
+
+async function testComplete() {
+    testInProgress = false;
+    testPhase = 'idle';
+    controlBtn.innerHTML = '<i class="fas fa-play"></i>';
+    progressText.textContent = 'Test complete!';
+
+    // Get DOM elements
+    const testTime = document.getElementById("test-time");
+    const serverResult = document.getElementById("server-result");
+
+    // Set time
+    const now = new Date();
+    testTime.textContent = now.toLocaleString();
+
+    // Set server (static or dynamically later)
+    serverResult.textContent = "Frankfurt, Germany";
+
+    // Fetch IP, ISP, and location
+    try {
+        const res = await fetch("https://api.ipify.org?format=json");
+        const ipData = await res.json();
+        const ip = ipData.ip;
+        const isIPv6 = ip.includes(":");
+        updateIPDisplay(ip, isIPv6);
+    } catch (error) {
+        console.error("Failed to fetch IP data:", error);
+        document.getElementById("ip-result").textContent = "Unavailable";
+        document.getElementById("isp-result").textContent = "N/A";
+        document.getElementById("location-result").textContent = "Unknown";
+        document.getElementById("ip-type").textContent = "Unknown";
+    }
+
+    showResults();
+}
+
+        function showResults() {
+            results.classList.remove('hidden');
+
+            const speedometerContainer = document.querySelector('.speedometer-container');
+            if (speedometerContainer) {
+                speedometerContainer.style.display = 'none';
+            }
+
+            // Hide the live display
+            const liveDisplay = document.querySelector('.live-display');
+            if (liveDisplay) {
+                liveDisplay.style.display = 'none';
+            }
+
+            const oldBtn = document.getElementById('start-again-btn');
+            if (oldBtn) oldBtn.remove('hidden');
+
+            const startAgainBtn = document.createElement('button');
+            startAgainBtn.id = 'start-again-btn';
+            startAgainBtn.innerHTML = '<i class="fas fa-redo-alt"></i>';
+            startAgainBtn.className = 'btn btn-primary mt-3 mx-auto block';
+            results.appendChild(startAgainBtn);
+
+            startAgainBtn.addEventListener('click', () => {
+                results.classList.add('hidden');
+                if (speedometerContainer) {
+                    speedometerContainer.style.display = 'block';
+                }
+                if (liveDisplay) {
+                    liveDisplay.style.display = 'block';
+                }
+                startTest();
+            });
+        }
+
+
+        function updateSpeedometer(speed) {
+            const maxSpeed = 200;
+            const normalizedSpeed = Math.min(speed, maxSpeed) / maxSpeed;
+            const angle = normalizedSpeed * 180;
+            progress.style.transform = `rotate(${angle}deg)`;
+            mask.style.transform = `rotate(${angle}deg)`;
+            speedValue.textContent = speed.toFixed(0);
+            if (Math.abs(speed - parseFloat(speedValue.textContent)) > 5) {
+                speedValue.classList.add('speed-change');
+                setTimeout(() => speedValue.classList.remove('speed-change'), 300);
+            }
+        }
+
+
+
+        function updateQualityIndicator(element, value, thresholds, lowerIsBetter) {
+            const indicator = element.querySelector('.indicator');
+            if (!indicator) return;
+            let qualityClass;
+            if (lowerIsBetter) {
+                if (value <= thresholds[0]) qualityClass = 'excellent';
+                else if (value <= thresholds[1]) qualityClass = 'good';
+                else if (value <= thresholds[2]) qualityClass = 'fair';
+                else qualityClass = 'poor';
+            } else {
+                if (value >= thresholds[2]) qualityClass = 'excellent';
+                else if (value >= thresholds[1]) qualityClass = 'good';
+                else if (value >= thresholds[0]) qualityClass = 'fair';
+                else qualityClass = 'poor';
+            }
+            indicator.className = `indicator indicator-${qualityClass}`;
+        }
+
+        function updatePacketLossQuality(element, value) {
+            const badge = element.querySelector('.badge');
+            if (!badge) return;
+            value = parseFloat(value);
+            let qualityText, qualityClass;
+            if (value === 0) {
+                qualityText = 'Excellent';
+                qualityClass = 'excellent';
+            } else if (value <= 1) {
+                qualityText = 'Good';
+                qualityClass = 'good';
+            } else if (value <= 3) {
+                qualityText = 'Fair';
+                qualityClass = 'fair';
+            } else {
+                qualityText = 'Poor';
+                qualityClass = 'poor';
+            }
+            badge.textContent = qualityText;
+            badge.className = `badge badge-${qualityClass}`;
+        }
+
+        // RAM Test Functionality
+        const startRamTestBtn = document.getElementById('start-ram-test');
+        const ramBar = document.getElementById('ram-bar');
+        const ramUsage = document.getElementById('ram-usage');
+        const ramSpeed = document.getElementById('ram-speed');
+        const totalRam = document.getElementById('total-ram');
+        const ramLatency = document.getElementById('ram-latency');
+
+        startRamTestBtn.addEventListener('click', startRamTest);
+
+        function startRamTest() {
+            startRamTestBtn.disabled = true;
+            startRamTestBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
+            const simulatedTotalRam = Math.floor(Math.random() * 16) + 8;
+            totalRam.textContent = `${simulatedTotalRam} GB`;
+            let progress = 0;
+            let testData = [];
+            const testInterval = setInterval(() => {
+                progress += 0.01;
+                if (progress > 1) progress = 1;
+                ramBar.style.height = `${progress * 100}%`;
+                ramUsage.textContent = `${Math.round(progress * 100)}% Used`;
+                const baseSpeed = 5000 + Math.random() * 15000;
+                const currentSpeed = baseSpeed * (0.5 + progress * 0.5);
+                testData.push(currentSpeed);
+                const baseLatency = 50 + Math.random() * 50;
+                const currentLatency = baseLatency * (1.5 - progress * 0.5);
+                ramSpeed.textContent = `${Math.round(currentSpeed).toLocaleString()} MB/s`;
+                updateQualityIndicator(ramSpeed, currentSpeed, [5000, 15000, 25000], false);
+                ramLatency.textContent = `${Math.round(currentLatency)} ns`;
+                updateQualityIndicator(ramLatency, currentLatency, [50, 100, 150], true);
+                if (progress < 1) {
+                    ramBar.classList.add('ram-pulse');
+                } else {
+                    ramBar.classList.remove('ram-pulse');
+                }
+                if (progress >= 1) {
+                    clearInterval(testInterval);
+                    const avgSpeed = testData.slice(Math.floor(testData.length * 0.3)).reduce((a, b) => a + b, 0) /
+                        (testData.length - Math.floor(testData.length * 0.3));
+                    ramSpeed.textContent = `${Math.round(avgSpeed).toLocaleString()} MB/s`;
+                    updateQualityIndicator(ramSpeed, avgSpeed, [5000, 15000, 25000], false);
+                    startRamTestBtn.disabled = false;
+                    startRamTestBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Run Again';
+                }
+            }, 50);
+        }
+
+        // CPU Test Functionality
+        const startCpuTestBtn = document.getElementById('start-cpu-test');
+        const cpuVisualization = document.getElementById('cpu-visualization');
+        const cpuScore = document.getElementById('cpu-score');
+        const cpuCores = document.getElementById('cpu-cores');
+        const cpuSpeed = document.getElementById('cpu-speed');
+        const cpuThreads = document.getElementById('cpu-threads');
+
+        const simulatedCores = navigator.hardwareConcurrency || Math.floor(Math.random() * 4) + 2;
+        cpuCores.textContent = simulatedCores;
+        cpuThreads.textContent = simulatedCores * 2;
+
+        for (let i = 0; i < simulatedCores; i++) {
+            const core = document.createElement('div');
+            core.className = 'cpu-core';
+            core.id = `cpu-core-${i}`;
+            core.style.left = `${(i / simulatedCores) * 100}%`;
+            core.style.width = `${80 / simulatedCores}%`;
+            const label = document.createElement('div');
+            label.className = 'cpu-core-label';
+            label.textContent = `Core ${i + 1}`;
+            cpuVisualization.appendChild(core);
+            cpuVisualization.appendChild(label);
+        }
+
+        startCpuTestBtn.addEventListener('click', startCpuTest);
+
+        function startCpuTest() {
+            startCpuTestBtn.disabled = true;
+            startCpuTestBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
+            const simulatedSpeed = (1 + Math.random() * 3).toFixed(2);
+            cpuSpeed.textContent = `${simulatedSpeed} GHz`;
+            let progress = 0;
+            let score = 0;
+            const testInterval = setInterval(() => {
+                progress += 0.02;
+                if (progress > 1) progress = 1;
+                for (let i = 0; i < simulatedCores; i++) {
+                    const core = document.getElementById(`cpu-core-${i}`);
+                    const fluctuation = Math.sin(progress * Math.PI * 8 + i) * 0.2 + 0.8;
+                    const coreLoad = Math.min(progress * fluctuation, 1);
+                    core.style.height = `${coreLoad * 100}%`;
+                    if (progress < 1) {
+                        core.classList.add('cpu-bounce');
+                    } else {
+                        core.classList.remove('cpu-bounce');
+                    }
+                }
+                score = Math.min(progress * 10000, 10000);
+                cpuScore.textContent = Math.round(score);
+                if (progress >= 1) {
+                    clearInterval(testInterval);
+                    startCpuTestBtn.disabled = false;
+                    startCpuTestBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Run Again';
+                }
+            }, 50);
+        }
+
+        // GPU Test Functionality
+        const startGpuTestBtn = document.getElementById('start-gpu-test');
+        const gpuCanvas = document.getElementById('gpu-canvas');
+        const fpsCounter = document.getElementById('fps-counter');
+        const gpuScore = document.getElementById('gpu-score');
+        const gpuRenderer = document.getElementById('gpu-renderer');
+        const gpuPerformance = document.getElementById('gpu-performance');
+
+        gpuCanvas.width = gpuCanvas.offsetWidth;
+        gpuCanvas.height = gpuCanvas.offsetHeight;
+        const ctx = gpuCanvas.getContext('2d');
+        const gl = gpuCanvas.getContext('webgl') || gpuCanvas.getContext('experimental-webgl');
+        if (gl) {
+            const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+            gpuRenderer.textContent = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) || "WebGL Compatible" : "WebGL Compatible";
+        } else {
+            gpuRenderer.textContent = "WebGL Not Supported";
+            startGpuTestBtn.disabled = true;
+        }
+
+        startGpuTestBtn.addEventListener('click', startGpuTest);
+
+        let gpuTestRunning = false;
+        let lastTime = 0;
+        let frames = 0;
+        let fps = 0;
+        let gpuTestInterval;
+
+        function startGpuTest() {
+            startGpuTestBtn.disabled = true;
+            startGpuTestBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
+            gpuTestRunning = true;
+            frames = 0;
+            fps = 0;
+            lastTime = performance.now();
+            renderFrame();
+            let score = 0;
+            gpuTestInterval = setInterval(() => {
+                score += fps / 10;
+                gpuScore.textContent = Math.round(score);
+                if (fps > 90) {
+                    gpuPerformance.innerHTML = '<span class="indicator indicator-excellent"></span> Excellent';
+                } else if (fps > 60) {
+                    gpuPerformance.innerHTML = '<span class="indicator indicator-good"></span> Good';
+                } else if (fps > 30) {
+                    gpuPerformance.innerHTML = '<span class="indicator indicator-fair"></span> Fair';
+                } else {
+                    gpuPerformance.innerHTML = '<span class="indicator indicator-poor"></span> Poor';
+                }
+                if (score >= 10000) {
+                    stopGpuTest();
+                }
+            }, 100);
+            setTimeout(() => {
+                if (gpuTestRunning) stopGpuTest();
+            }, 15000);
+        }
+
+        function stopGpuTest() {
+            gpuTestRunning = false;
+            clearInterval(gpuTestInterval);
+            startGpuTestBtn.disabled = false;
+            startGpuTestBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Run Again';
+            ctx.clearRect(0, 0, gpuCanvas.width, gpuCanvas.height);
+        }
+
+        function renderFrame() {
+            if (!gpuTestRunning) return;
+            const now = performance.now();
+            frames++;
+            if (now >= lastTime + 1000) {
+                fps = Math.round((frames * 1000) / (now - lastTime));
+                fpsCounter.textContent = `${fps} FPS`;
+                lastTime = now;
+                frames = 0;
+            }
+            const time = now / 1000;
+            const width = gpuCanvas.width;
+            const height = gpuCanvas.height;
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, width, height);
+            for (let i = 0; i < 100; i++) {
+                const x = width / 2 + Math.sin(time + i * 0.2) * width * 0.4;
+                const y = height / 2 + Math.cos(time * 0.7 + i * 0.1) * height * 0.4;
+                const size = 10 + Math.sin(time * 1.3 + i) * 8;
+                const hue = (time * 20 + i * 10) % 360;
+                ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = `hsl(${hue}, 100%, 50%)`;
+            }
+            requestAnimationFrame(renderFrame);
+        }
+    
+      
+    </script>
+</body>
+</html>
