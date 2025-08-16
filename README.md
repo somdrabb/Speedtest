@@ -1,2 +1,2 @@
-# Speedtest
+# Schnelltest
 Internetschnelltest.de
