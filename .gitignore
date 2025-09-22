@@ -16,3 +16,18 @@ _site/
 # counterproductive to check this file into the repository.
 # Details at https://github.com/github/pages-gem/issues/768
 Gemfile.lock
+# OS / editor
+.DS_Store
+*.log
+.vscode/
+.idea/
+
+# Docker/Caddy runtime data (never commit)
+server/caddy_data/
+server/caddy_config/
+
+# Node/build (if you ever add tooling)
+dist/
+build/
+node_modules/
+
