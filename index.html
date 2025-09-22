@@ -2021,5 +2021,24 @@ async function testComplete() {
     
       
     </script>
+
+  <script type="module">
+  import { runDownload, runUpload } from "https://cdn.jsdelivr.net/npm/@m-lab/ndt7@0.11.0/dist/ndt7.min.js";
+
+  async function test() {
+    const dl = await runDownload({ userAcceptedDataPolicy: true });
+    const ul = await runUpload({ userAcceptedDataPolicy: true });
+    // dl.Mbps and ul.Mbps are the measured speeds (approx).
+    document.getElementById('down').textContent = dl.Mbps.toFixed(2) + " Mbps";
+    document.getElementById('up').textContent   = ul.Mbps.toFixed(2) + " Mbps";
+    // Optional: dl.MinRTT, jitter estimates, logs, etc. are available too.
+  }
+  test();
+</script>
+
+<div>Download: <span id="down">…</span></div>
+<div>Upload: <span id="up">…</span></div>
+
+  
 </body>
 </html>
