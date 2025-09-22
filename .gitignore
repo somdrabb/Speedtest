@@ -7,3 +7,6 @@ README.md
 index.html
 robots.txt
 sitemap.xml
+server/
+ ├─ docker-compose.yml
+ └─ Caddyfile
