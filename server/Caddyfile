@@ -1,0 +1,8 @@
+internetschnelltest.de {
+  encode gzip
+  reverse_proxy librespeed:80
+  @static path /favicon.ico /robots.txt
+  handle @static {
+    reverse_proxy librespeed:80
+  }
+}
