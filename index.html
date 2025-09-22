@@ -1258,346 +1258,157 @@
     </footer>
 
 
-    <script type="module">
-  // --- Real speed test via M-Lab ndt7 (no backend needed) ---
-  import { runDownload, runUpload } from "https://cdn.jsdelivr.net/npm/@m-lab/ndt7@0.11.0/dist/ndt7.min.js";
+<script type="module">
+  async function loadNDT7() {
+    try {
+      return await import('https://cdn.jsdelivr.net/npm/@m-lab/ndt7@latest/dist/ndt7.min.js');
+    } catch (e) {
+      console.warn('jsDelivr failed, falling back to unpkg', e);
+      return await import('https://unpkg.com/@m-lab/ndt7@latest/dist/ndt7.min.js');
+    }
+  }
 
-  // ------------- DOM refs (existing IDs from your HTML) -------------
-  // nav
-  const homeLink = document.getElementById('home-link');
-  const navSpeed = document.getElementById('nav-speed');
-  const navRam   = document.getElementById('nav-ram');
-  const navCpu   = document.getElementById('nav-cpu');
-  const navGpu   = document.getElementById('nav-gpu');
-  const footerSpeed = document.getElementById('footer-speed');
-  const footerRam   = document.getElementById('footer-ram');
-  const footerCpu   = document.getElementById('footer-cpu');
-  const footerGpu   = document.getElementById('footer-gpu');
+  const {
+    runDownload,
+    runUpload
+  } = await loadNDT7();
 
-  // sections
-  const speedTestSection     = document.getElementById('speed-test-section');
-  const hardwareTestsSection = document.getElementById('hardware-tests-section');
-
-  // tabs inside hardware tests
-  const ramTestBtn = document.getElementById('ram-test-btn');
-  const cpuTestBtn = document.getElementById('cpu-test-btn');
-  const gpuTestBtn = document.getElementById('gpu-test-btn');
-  const ramTestContainer = document.getElementById('ram-test-container');
-  const cpuTestContainer = document.getElementById('cpu-test-container');
-  const gpuTestContainer = document.getElementById('gpu-test-container');
-
-  // speed test UI
+  // ===== wire up your existing UI (IDs must match your HTML) =====
   const controlBtn   = document.getElementById('control-btn');
-  const liveSpeed    = document.getElementById('live-speed');
-  const speedValue   = document.getElementById('speed-value');
-  const unit         = document.getElementById('unit');
-  const liveUnit     = document.getElementById('live-unit');
-  const progressArc  = document.getElementById('progress');
-  const maskArc      = document.getElementById('mask');
   const progressText = document.getElementById('progress-text');
   const results      = document.getElementById('results');
+  const liveSpeed    = document.getElementById('live-speed');
+  const downloadResult = document.getElementById('download-result');
+  const uploadResult   = document.getElementById('upload-result');
+  const pingResult     = document.getElementById('ping-result');
+  const jitterResult   = document.getElementById('jitter-result');
+  const loadLatencyResult = document.getElementById('load-latency-result');
+  const testTimeEl = document.getElementById('test-time');
+  const serverResult = document.getElementById('server-result');
 
-  const downloadResult   = document.getElementById('download-result');
-  const uploadResult     = document.getElementById('upload-result');
-  const pingResult       = document.getElementById('ping-result');
-  const jitterResult     = document.getElementById('jitter-result');
-  const loadLatencyResult= document.getElementById('load-latency-result');
-  const packetLossResult = document.getElementById('packet-loss-result'); // we don't measure; leave "0%" or "—"
-  const ipResult         = document.getElementById('ip-result');
-  const ipType           = document.getElementById('ip-type');
-  const ispResult        = document.getElementById('isp-result');
-  const locationResult   = document.getElementById('location-result');
-  const serverResult     = document.getElementById('server-result');
-  const connectionTypeEl = document.getElementById('connection-type');
-  const testTimeEl       = document.getElementById('test-time');
-
-  // ------------- Navigation -------------
-  function showSpeedTest() {
-    speedTestSection.style.display = 'block';
-    hardwareTestsSection.style.display = 'none';
-    document.title = "Network Performance Analyzer";
-  }
-  function showHardwareTests() {
-    speedTestSection.style.display = 'none';
-    hardwareTestsSection.style.display = 'block';
-    document.title = "Hardware Performance Tests";
-  }
-  function showRamTest() {
-    ramTestBtn.classList.add('active');
-    cpuTestBtn.classList.remove('active');
-    gpuTestBtn.classList.remove('active');
-    ramTestContainer.classList.add('active');
-    cpuTestContainer.classList.remove('active');
-    gpuTestContainer.classList.remove('active');
-  }
-  function showCpuTest() {
-    ramTestBtn.classList.remove('active');
-    cpuTestBtn.classList.add('active');
-    gpuTestBtn.classList.remove('active');
-    ramTestContainer.classList.remove('active');
-    cpuTestContainer.classList.add('active');
-    gpuTestContainer.classList.remove('active');
-  }
-  function showGpuTest() {
-    ramTestBtn.classList.remove('active');
-    cpuTestBtn.classList.remove('active');
-    gpuTestBtn.classList.add('active');
-    ramTestContainer.classList.remove('active');
-    cpuTestContainer.classList.remove('active');
-    gpuTestContainer.classList.add('active');
-  }
-
-  [homeLink, navSpeed, footerSpeed].forEach(el => el?.addEventListener('click', (e)=>{ e.preventDefault(); showSpeedTest(); }));
-  [navRam, footerRam].forEach(el => el?.addEventListener('click', (e)=>{ e.preventDefault(); showHardwareTests(); showRamTest(); }));
-  [navCpu, footerCpu].forEach(el => el?.addEventListener('click', (e)=>{ e.preventDefault(); showHardwareTests(); showCpuTest(); }));
-  [navGpu, footerGpu].forEach(el => el?.addEventListener('click', (e)=>{ e.preventDefault(); showHardwareTests(); showGpuTest(); }));
-  ramTestBtn?.addEventListener('click', showRamTest);
-  cpuTestBtn?.addEventListener('click', showCpuTest);
-  gpuTestBtn?.addEventListener('click', showGpuTest);
-
-  showSpeedTest();
-  showRamTest();
-
-  // ------------- Connection meta -------------
-  connectionTypeEl.textContent = (navigator.connection?.effectiveType) || "Unknown";
-
-  // ------------- IP / ISP / Location -------------
-  async function fetchIPInfo() {
-    try {
-      const ipRes = await fetch("https://api.ipify.org?format=json");
-      const { ip } = await ipRes.json();
-      const isIPv6 = ip.includes(":");
-      updateIPDisplay(ip, isIPv6);
-
-      const locRes = await fetch(`https://ipapi.co/${ip}/json/`);
-      const data = await locRes.json();
-      ispResult.textContent = data.org || "N/A";
-      locationResult.textContent = `${data.city || "Unknown"}, ${data.country_name || "Unknown"}`;
-    } catch (e) {
-      ipResult.textContent = "Unavailable";
-      ipType.textContent = "Unknown";
-      ispResult.textContent = "N/A";
-      locationResult.textContent = "Unknown";
-    }
-  }
-  function ipv6ToDecimal(ipv6) {
-    const expanded = ipv6.includes("::")
-      ? (() => {
-          const [left, right=""] = ipv6.split("::");
-          const l = left ? left.split(":") : [];
-          const r = right ? right.split(":") : [];
-          const missing = 8 - (l.length + r.length);
-          return [...l, ...Array(missing).fill("0"), ...r].join(":");
-        })()
-      : ipv6;
-    const parts = expanded.split(":").map(h => parseInt(h || "0", 16));
-    let dec = BigInt(0);
-    for (const p of parts) dec = dec * BigInt(0x10000) + BigInt(p);
-    return dec.toString();
-  }
-  function updateIPDisplay(ip, isIPv6) {
-    ipResult.textContent = isIPv6 ? ipv6ToDecimal(ip) : ip;
-    ipType.textContent = isIPv6 ? "IPv6 (Decimal)" : "IPv4";
-    const badge = ipType.nextElementSibling;
-    if (badge) {
-      badge.className = `badge ${isIPv6 ? 'status-ipv6' : 'status-ipv4'}`;
-      badge.textContent = isIPv6 ? 'IPv6' : 'IPv4';
-    }
-  }
-  fetchIPInfo();
-
-  // ------------- Speedometer helper -------------
-  function updateSpeedometer(speedMbps) {
-    const max = 200; // adjust if you want a different scale
-    const clamped = Math.max(0, Math.min(speedMbps, max));
-    const angle = (clamped / max) * 180;
+  const progressArc = document.getElementById('progress');
+  const maskArc     = document.getElementById('mask');
+  function updateSpeedometer(mbps) {
+    const max = 200;
+    const v = Math.max(0, Math.min(mbps, max));
+    const angle = v / max * 180;
     progressArc.style.transform = `rotate(${angle}deg)`;
-    maskArc.style.transform = `rotate(${angle}deg)`;
-    speedValue.textContent = clamped.toFixed(0);
+    maskArc.style.transform     = `rotate(${angle}deg)`;
+    document.getElementById('speed-value').textContent = v.toFixed(0);
   }
 
-  // ------------- Progress bar (download/upload) -------------
-  function ensureProgressBar() {
-    if (document.getElementById('progress-bar-wrapper')) return;
-    const wrapper = document.createElement('div');
-    wrapper.id = 'progress-bar-wrapper';
-    wrapper.style.width = '100%';
-    wrapper.style.display = 'flex';
-    wrapper.style.justifyContent = 'center';
-    wrapper.style.margin = '12px 0';
-    wrapper.style.height = '10px';
-
-    const container = document.createElement('div');
-    container.id = 'progress-bar-container';
-    container.style.width = '50%';
-    container.style.height = '100%';
-    container.style.background = '#e0e0e0';
-    container.style.borderRadius = '5px';
-    container.style.overflow = 'hidden';
-
+  function ensureBar() {
+    if (document.getElementById('progress-bar')) return;
+    const wrap = document.createElement('div');
+    wrap.id = 'progress-bar-wrapper';
+    wrap.style.cssText = 'width:100%;display:flex;justify-content:center;margin:12px 0;height:10px;';
+    const cont = document.createElement('div');
+    cont.style.cssText = 'width:50%;height:100%;background:#e0e0e0;border-radius:5px;overflow:hidden;';
     const bar = document.createElement('div');
     bar.id = 'progress-bar';
-    bar.style.width = '0%';
-    bar.style.height = '100%';
-    bar.style.background = '#4cafef'; // blue for download; we change to green for upload
-    bar.style.transition = 'width 0.1s linear, background 0.3s';
+    bar.style.cssText = 'width:0;height:100%;background:#4cafef;transition:width .1s linear;';
+    cont.appendChild(bar); wrap.appendChild(cont);
+    progressText.parentNode.insertBefore(wrap, progressText.nextSibling);
+  }
+  function setBar(p){ const b=document.getElementById('progress-bar'); if(b)b.style.width = (Math.max(0,Math.min(1,p))*100)+'%'; }
+  function removeBar(){ document.getElementById('progress-bar-wrapper')?.remove(); }
 
-    container.appendChild(bar);
-    wrapper.appendChild(container);
-    progressText.parentNode.insertBefore(wrapper, progressText.nextSibling);
-  }
-  function setProgress(pct01) {
-    const bar = document.getElementById('progress-bar');
-    if (bar) bar.style.width = `${Math.max(0, Math.min(1, pct01))*100}%`;
-  }
-  function removeProgressBar() {
-    const wrap = document.getElementById('progress-bar-wrapper');
-    if (wrap) wrap.remove();
-  }
-
-  // ------------- Quality indicator (reuses your badges) -------------
-  function updateQualityIndicator(element, value, thresholds, lowerIsBetter) {
-    const indicator = element?.querySelector('.indicator');
-    if (!indicator || typeof value !== 'number' || Number.isNaN(value)) return;
-    let qualityClass;
-    if (lowerIsBetter) {
-      if (value <= thresholds[0]) qualityClass = 'excellent';
-      else if (value <= thresholds[1]) qualityClass = 'good';
-      else if (value <= thresholds[2]) qualityClass = 'fair';
-      else qualityClass = 'poor';
-    } else {
-      if (value >= thresholds[2]) qualityClass = 'excellent';
-      else if (value >= thresholds[1]) qualityClass = 'good';
-      else if (value >= thresholds[0]) qualityClass = 'fair';
-      else qualityClass = 'poor';
-    }
-    indicator.className = `indicator indicator-${qualityClass}`;
-  }
-
-  // ------------- Real Test Controller -------------
   let running = false;
-
   controlBtn.addEventListener('click', async () => {
     if (running) return;
     running = true;
-    controlBtn.innerHTML = '<i class="fas fa-stop"></i>';
     results.classList.add('hidden');
     liveSpeed.textContent = '0';
     updateSpeedometer(0);
-    packetLossResult.textContent = '—'; // ndt7 does not provide packet loss directly
 
-    // meta
-    const now = new Date();
-    testTimeEl.textContent = now.toLocaleString();
-    serverResult.textContent = "M-Lab ndt7 (closest site)";
+    testTimeEl.textContent = new Date().toLocaleString();
+    serverResult.textContent = 'M-Lab ndt7 (nearest site)';
 
-    ensureProgressBar();
-    setProgress(0);
+    ensureBar(); setBar(0);
     progressText.textContent = 'Testing download…';
+    controlBtn.innerHTML = '<i class="fas fa-stop"></i>';
 
-    const rtts = []; // collect MinRTT samples across phases (ms)
+    const rtts = [];
 
     try {
-      // -------- DOWNLOAD --------
+      // ---- DOWNLOAD ----
       const t0 = performance.now();
       const dl = await runDownload({
         userAcceptedDataPolicy: true,
-        onDownloadMeasurement: (m) => {
-          // m.Mbps is instantaneous estimate
+        onDownloadMeasurement: m => {
           if (m?.Mbps != null) {
             liveSpeed.textContent = m.Mbps.toFixed(1);
             updateSpeedometer(m.Mbps);
           }
           if (m?.MinRTT != null) rtts.push(m.MinRTT);
-          const elapsed = performance.now() - t0;
-          // 8 seconds nominal; progress is approximate for UX
-          setProgress(Math.min(1, elapsed / 8000));
+          setBar(Math.min(1, (performance.now() - t0) / 8000));
         }
       });
       downloadResult.textContent = dl.Mbps.toFixed(1);
-      updateQualityIndicator(downloadResult, dl.Mbps, [10, 25, 50], false);
-      if (dl?.MinRTT != null) {
-        pingResult.textContent = dl.MinRTT.toFixed(1);
-        updateQualityIndicator(pingResult, dl.MinRTT, [20, 50, 100], true);
-      }
+      if (dl?.MinRTT != null) pingResult.textContent = dl.MinRTT.toFixed(1);
 
-      // -------- UPLOAD --------
-      const bar = document.getElementById('progress-bar');
-      if (bar) bar.style.background = '#4caf50'; // green for upload
+      // ---- UPLOAD ----
+      document.getElementById('progress-bar').style.background = '#4caf50';
       progressText.textContent = 'Testing upload…';
       const t1 = performance.now();
       const ul = await runUpload({
         userAcceptedDataPolicy: true,
-        onUploadMeasurement: (m) => {
+        onUploadMeasurement: m => {
           if (m?.Mbps != null) {
             liveSpeed.textContent = m.Mbps.toFixed(1);
             updateSpeedometer(m.Mbps);
           }
           if (m?.MinRTT != null) rtts.push(m.MinRTT);
-          const elapsed = performance.now() - t1;
-          setProgress(Math.min(1, elapsed / 8000));
+          setBar(Math.min(1, (performance.now() - t1) / 8000));
         }
       });
       uploadResult.textContent = ul.Mbps.toFixed(1);
-      updateQualityIndicator(uploadResult, ul.Mbps, [5, 15, 30], false);
 
-      // -------- JITTER (rough MAD over MinRTT samples) --------
+      // ---- JITTER (rough) & load latency ----
       if (rtts.length >= 2) {
-        const mean = rtts.reduce((a,b)=>a+b,0) / rtts.length;
-        const mad  = rtts.map(v=>Math.abs(v-mean)).reduce((a,b)=>a+b,0) / rtts.length;
+        const mean = rtts.reduce((a,b)=>a+b,0)/rtts.length;
+        const mad  = rtts.map(v=>Math.abs(v-mean)).reduce((a,b)=>a+b,0)/rtts.length;
         jitterResult.textContent = mad.toFixed(1);
-        updateQualityIndicator(jitterResult, mad, [5, 15, 30], true);
       } else {
         jitterResult.textContent = '—';
       }
-
-      // A simple load-latency hint = last known MinRTT (if present)
       const lastRTT = rtts.at(-1);
-      loadLatencyResult.textContent = (typeof lastRTT === 'number') ? `${lastRTT.toFixed(1)} ms` : '—';
+      loadLatencyResult.textContent = (typeof lastRTT==='number') ? `${lastRTT.toFixed(1)} ms` : '—';
 
       progressText.textContent = 'Test complete!';
-      removeProgressBar();
-
-      // Show results panel + start-again button
-      showResults();
-    } catch (err) {
-      console.error(err);
-      progressText.textContent = 'Test failed. Please try again.';
-      removeProgressBar();
-      controlBtn.innerHTML = '<i class="fas fa-play"></i>';
+      removeBar();
+      results.classList.remove('hidden');
+    } catch (e) {
+      console.error(e);
+      progressText.textContent = 'Test failed. Please refresh and try again.';
+      removeBar();
     } finally {
       running = false;
+      controlBtn.innerHTML = '<i class="fas fa-play"></i>';
       liveSpeed.textContent = '0';
       updateSpeedometer(0);
-      controlBtn.innerHTML = '<i class="fas fa-play"></i>';
     }
   });
 
-  function showResults() {
-    results.classList.remove('hidden');
+  // Optional: set connection type label
+  const connectionType = document.getElementById('connection-type');
+  connectionType.textContent = navigator.connection?.effectiveType || 'Unknown';
 
-    const speedometerContainer = document.querySelector('.speedometer-container');
-    const liveDisplay         = document.querySelector('.live-display');
-    if (speedometerContainer) speedometerContainer.style.display = 'none';
-    if (liveDisplay)          liveDisplay.style.display = 'none';
+  // Basic IP/ISP/Location (same as before)
+  (async () => {
+    try {
+      const { ip } = await (await fetch('https://api.ipify.org?format=json')).json();
+      document.getElementById('ip-result').textContent = ip;
+      document.getElementById('ip-type').textContent = ip.includes(':') ? 'IPv6' : 'IPv4';
+      const info = await (await fetch(`https://ipapi.co/${ip}/json/`)).json();
+      document.getElementById('isp-result').textContent = info.org || 'N/A';
+      document.getElementById('location-result').textContent = `${info.city || 'Unknown'}, ${info.country_name || 'Unknown'}`;
+    } catch {}
+  })();
 
-    const oldBtn = document.getElementById('start-again-btn');
-    if (oldBtn) oldBtn.remove();
+  // Keep your RAM/CPU/GPU test code if you like (it’s unrelated to ndt7)
 
-    const startAgainBtn = document.createElement('button');
-    startAgainBtn.id = 'start-again-btn';
-    startAgainBtn.innerHTML = '<i class="fas fa-redo-alt"></i>';
-    startAgainBtn.className = 'btn btn-primary mt-3 mx-auto block';
-    results.appendChild(startAgainBtn);
 
-    startAgainBtn.addEventListener('click', () => {
-      results.classList.add('hidden');
-      if (speedometerContainer) speedometerContainer.style.display = 'block';
-      const liveDisplay2 = document.querySelector('.live-display');
-      if (liveDisplay2) liveDisplay2.style.display = 'block';
-      // user will press Play again to start a new test
-    });
-  }
 
   // ------------- Hardware tests (keep your visual simulators) -------------
   // RAM
