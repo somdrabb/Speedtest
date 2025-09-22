@@ -1258,786 +1258,505 @@
     </footer>
     <script src="script.js" defer></script>
 
-    <script>
-        // Navigation Functionality
-        const homeLink = document.getElementById('home-link');
-        const navSpeed = document.getElementById('nav-speed');
-        const navRam = document.getElementById('nav-ram');
-        const navCpu = document.getElementById('nav-cpu');
-        const navGpu = document.getElementById('nav-gpu');
-        const footerSpeed = document.getElementById('footer-speed');
-        const footerRam = document.getElementById('footer-ram');
-        const footerCpu = document.getElementById('footer-cpu');
-        const footerGpu = document.getElementById('footer-gpu');
-        const speedTestSection = document.getElementById('speed-test-section');
-        const hardwareTestsSection = document.getElementById('hardware-tests-section');
-        const ramTestBtn = document.getElementById('ram-test-btn');
-        const cpuTestBtn = document.getElementById('cpu-test-btn');
-        const gpuTestBtn = document.getElementById('gpu-test-btn');
-        const ramTestContainer = document.getElementById('ram-test-container');
-        const cpuTestContainer = document.getElementById('cpu-test-container');
-        const gpuTestContainer = document.getElementById('gpu-test-container');
-        
-
-
-        function showSpeedTest() {
-            speedTestSection.style.display = 'block';
-            hardwareTestsSection.style.display = 'none';
-            document.title = "Network Performance Analyzer";
-        }
-
-        function showHardwareTests() {
-            speedTestSection.style.display = 'none';
-            hardwareTestsSection.style.display = 'block';
-            document.title = "Hardware Performance Tests";
-        }
-
-        function showRamTest() {
-            ramTestBtn.classList.add('active');
-            cpuTestBtn.classList.remove('active');
-            gpuTestBtn.classList.remove('active');
-            ramTestContainer.classList.add('active');
-            cpuTestContainer.classList.remove('active');
-            gpuTestContainer.classList.remove('active');
-        }
-
-        function showCpuTest() {
-            ramTestBtn.classList.remove('active');
-            cpuTestBtn.classList.add('active');
-            gpuTestBtn.classList.remove('active');
-            ramTestContainer.classList.remove('active');
-            cpuTestContainer.classList.add('active');
-            gpuTestContainer.classList.remove('active');
-        }
-
-        function showGpuTest() {
-            ramTestBtn.classList.remove('active');
-            cpuTestBtn.classList.remove('active');
-            gpuTestBtn.classList.add('active');
-            ramTestContainer.classList.remove('active');
-            cpuTestContainer.classList.remove('active');
-            gpuTestContainer.classList.add('active');
-        }
-
-        homeLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            showSpeedTest();
-        });
-
-        navSpeed.addEventListener('click', (e) => {
-            e.preventDefault();
-            showSpeedTest();
-        });
-
-        navRam.addEventListener('click', (e) => {
-            e.preventDefault();
-            showHardwareTests();
-            showRamTest();
-        });
-
-        navCpu.addEventListener('click', (e) => {
-            e.preventDefault();
-            showHardwareTests();
-            showCpuTest();
-        });
-
-        navGpu.addEventListener('click', (e) => {
-            e.preventDefault();
-            showHardwareTests();
-            showGpuTest();
-        });
-
-        footerSpeed.addEventListener('click', (e) => {
-            e.preventDefault();
-            showSpeedTest();
-        });
-
-        footerRam.addEventListener('click', (e) => {
-            e.preventDefault();
-            showHardwareTests();
-            showRamTest();
-        });
-
-        footerCpu.addEventListener('click', (e) => {
-            e.preventDefault();
-            showHardwareTests();
-            showCpuTest();
-        });
-
-        footerGpu.addEventListener('click', (e) => {
-            e.preventDefault();
-            showHardwareTests();
-            showGpuTest();
-        });
-
-        ramTestBtn.addEventListener('click', showRamTest);
-        cpuTestBtn.addEventListener('click', showCpuTest);
-        gpuTestBtn.addEventListener('click', showGpuTest);
-
-        // Initialize
-        showSpeedTest();
-        showRamTest();
-
-        // Speed Test Functionality
-        const controlBtn = document.getElementById('control-btn');
-        const liveSpeed = document.getElementById('live-speed');
-        const speedValue = document.getElementById('speed-value');
-        const unit = document.getElementById('unit');
-        const liveUnit = document.getElementById('live-unit');
-        const progress = document.getElementById('progress');
-        const mask = document.getElementById('mask');
-        const progressText = document.getElementById('progress-text');
-        const results = document.getElementById('results');
-        const downloadResult = document.getElementById('download-result');
-        const uploadResult = document.getElementById('upload-result');
-        const pingResult = document.getElementById('ping-result');
-        const jitterResult = document.getElementById('jitter-result');
-        const loadLatencyResult = document.getElementById('load-latency-result');
-        const packetLossResult = document.getElementById('packet-loss-result');
-        const ipResult = document.getElementById('ip-result');
-        const ipType = document.getElementById('ip-type');
-        const ispResult = document.getElementById('isp-result');
-        const locationResult = document.getElementById('location-result');
-        const serverResult = document.getElementById('server-result');
-        const connectionType = document.getElementById('connection-type');
-        const testTime = document.getElementById('test-time');
-
-        let testInProgress = false;
-        let downloadSpeed = 0;
-        let uploadSpeed = 0;
-        let ping = 0;
-        let jitter = 0;
-        let loadLatency = 0;
-        let packetLoss = 0;
-        let testPhase = 'idle';
-        let testStartTime;
-        let testInterval;
-        let downloadTestData = [];
-        let uploadTestData = [];
-        let pingTests = [];
-
-        updateSpeedometer(0);
-        fetchIPInfo();
-
-        if (navigator.connection) {
-            connectionType.textContent = navigator.connection.effectiveType || "Unknown";
-        } else {
-            connectionType.textContent = "Unknown";
-        }
-
-        controlBtn.addEventListener('click', toggleTest);
-
-        function toggleTest() {
-            if (testInProgress) {
-                stopTest();
-            } else {
-                startTest();
-            }
-        }
-
-        function startTest() {
-            testInProgress = true;
-            testPhase = 'ping';
-            controlBtn.innerHTML = '<i class="fas fa-stop"></i>';
-            progressText.textContent = 'Testing ping...';
-            results.classList.add('hidden');
-
-            downloadSpeed = 0;
-            uploadSpeed = 0;
-            ping = 0;
-            jitter = 0;
-            loadLatency = 0;
-            packetLoss = 0;
-            downloadTestData = [];
-            uploadTestData = [];
-            pingTests = [];
-
-            testPing();
-        }
-
-        function stopTest() {
-            testInProgress = false;
-            testPhase = 'idle';
-            controlBtn.innerHTML = '<i class="fas fa-play"></i>';
-            progressText.textContent = 'Test stopped';
-            clearInterval(testInterval);
-            updateSpeedometer(0);
-            liveSpeed.textContent = '0';
-            if (downloadSpeed > 0 || uploadSpeed > 0) {
-                showResults();
-            }
-        }
-
-
-
-
-
-        function testPing() {
-            const startTime = Date.now();
-            const simulatedLatency = Math.random() * 90 + 10;
-
-            setTimeout(() => {
-                pingTests.push(simulatedLatency);
-
-                if (pingTests.length < 5) {
-                    testPing();
-                } else {
-                    // Calculate ping & jitter
-                    ping = pingTests.reduce((a, b) => a + b, 0) / pingTests.length;
-                    const deviations = pingTests.map(t => Math.abs(t - ping));
-                    jitter = deviations.reduce((a, b) => a + b, 0) / deviations.length;
-
-                    pingResult.textContent = `${ping.toFixed(1)}`;
-                    updateQualityIndicator(pingResult, ping, [20, 50, 100], true);
-
-                    jitterResult.textContent = `${jitter.toFixed(1)}`;
-                    updateQualityIndicator(jitterResult, jitter, [5, 15, 30], true);
-
-                    // Start download test
-                    testPhase = 'download';
-                    progressText.textContent = 'Testing download speed...';
-
-                    // Create progress bar only once
-                    if (!document.getElementById('progress-bar-wrapper')) {
-                        const wrapper = document.createElement('div');
-                        wrapper.id = 'progress-bar-wrapper';
-                        wrapper.style.width = '100%';
-                        wrapper.style.display = 'flex';
-                        wrapper.style.justifyContent = 'center';
-                        wrapper.style.margin = '12px 0';
-                        wrapper.style.height = '10px';
-
-                        const container = document.createElement('div');
-                        container.id = 'progress-bar-container';
-                        container.style.width = '50%';
-                        container.style.height = '100%';
-                        container.style.background = '#e0e0e0';
-                        container.style.borderRadius = '5px';
-                        container.style.overflow = 'hidden';
-
-                        const bar = document.createElement('div');
-                        bar.id = 'progress-bar';
-                        bar.style.width = '0%';
-                        bar.style.height = '100%';
-                        bar.style.background = '#4cafef'; // blue for download
-                        bar.style.transition = 'width 0.1s linear, background 0.3s';
-
-                        container.appendChild(bar);
-                        wrapper.appendChild(container);
-                        progressText.parentNode.insertBefore(wrapper, progressText.nextSibling);
-                    }
-
-                    testDownload();
-                }
-            }, simulatedLatency);
-
-        }
-
-
-
-
-        function testDownload() {
-            testStartTime = Date.now();
-            const testDuration = 5000;
-
-            testInterval = setInterval(() => {
-                const elapsed = Date.now() - testStartTime;
-                const progress = Math.min(elapsed / testDuration, 1);
-
-                const progressBar = document.getElementById('progress-bar');
-                if (progressBar) progressBar.style.width = (progress * 100) + '%';
-
-                // Simulate download speed
-                let currentSpeed;
-                if (progress < 0.3) currentSpeed = 50 * (progress / 0.3);
-                else currentSpeed = 50 + Math.random() * 50 + Math.sin(progress * Math.PI * 4) * 20;
-
-                downloadTestData.push(currentSpeed);
-                downloadSpeed = downloadTestData.reduce((a, b) => a + b, 0) / downloadTestData.length;
-
-                updateSpeedometer(currentSpeed);
-                liveSpeed.textContent = currentSpeed.toFixed(1);
-
-                if (progress >= 1) {
-                    clearInterval(testInterval);
-
-                    downloadSpeed = calculateFinalSpeed(downloadTestData);
-                    downloadResult.textContent = `${downloadSpeed.toFixed(1)}`;
-                    updateQualityIndicator(downloadResult, downloadSpeed, [10, 25, 50], false);
-
-                    loadLatency = ping + Math.random() * 30;
-                    loadLatencyResult.textContent = `${loadLatency.toFixed(1)} ms`;
-
-                    // Start upload test
-                    testPhase = 'upload';
-                    progressText.textContent = 'Testing upload speed...';
-
-                    // Change progress bar color to green for upload
-                    const progressBarContainer = document.getElementById('progress-bar');
-                    if (progressBarContainer) progressBarContainer.style.background = '#4caf50';
-
-                    testUpload();
-                }
-            }, 100);
-
-        }
-
-        function testUpload() {
-    testStartTime = Date.now();
-    const testDuration = 5000;
-
-    testInterval = setInterval(() => {
-        const elapsed = Date.now() - testStartTime;
-        const progress = Math.min(elapsed / testDuration, 1);
-
-        const progressBar = document.getElementById('progress-bar');
-        if (progressBar) progressBar.style.width = (progress * 100) + '%';
-
-        // Simulate upload speed
-        let currentSpeed;
-        if (progress < 0.3) currentSpeed = 20 * (progress / 0.3);
-        else currentSpeed = 20 + Math.random() * 30 + Math.sin(progress * Math.PI * 4) * 10;
-
-        uploadTestData.push(currentSpeed);
-        uploadSpeed = uploadTestData.reduce((a, b) => a + b, 0) / uploadTestData.length;
-        updateSpeedometer(currentSpeed);
-
-        liveSpeed.textContent = currentSpeed.toFixed(1);
-
-        if (progress >= 1) {
-            clearInterval(testInterval);
-
-            uploadSpeed = calculateFinalSpeed(uploadTestData);
-            uploadResult.textContent = `${uploadSpeed.toFixed(1)}`;
-            updateQualityIndicator(uploadResult, uploadSpeed, [5, 15, 30], false);
-
-            // Remove progress bar after upload completes
-            const progressWrapper = document.getElementById('progress-bar-wrapper');
-            if (progressWrapper) progressWrapper.remove();
-            testComplete(); // Call testComplete instead of showResults
-        }
-    }, 100);
-}
-
-
-
-        function calculateFinalSpeed(speedData) {
-            const discardCount = Math.floor(speedData.length * 0.2);
-            const relevantData = speedData.slice(discardCount);
-            return relevantData.reduce((a, b) => a + b, 0) / relevantData.length;
-        }
-
-
-
-
-        function ipv6ToDecimal(ipv6) {
-    // Expand shorthand notation (::) for IPv6 if needed
-    const fullIp = ipv6.split("::").reduce((acc, part, i, arr) => {
-        if (arr.length === 1) return ipv6; // no ::
-        const left = part.split(":");
-        const right = arr[1].split(":");
-        const missing = 8 - (left.length + right.length);
-        return [
-            ...left,
-            ...Array(missing).fill("0"),
-            ...right
-        ].join(":");
-    }, "");
-
-    const parts = fullIp.split(":").map(h => parseInt(h, 16));
-    // Convert to a single decimal number using BigInt (IPv6 is 128-bit)
-    let decimal = BigInt(0);
-    for (let i = 0; i < parts.length; i++) {
-        decimal = decimal * BigInt(0x10000) + BigInt(parts[i]);
-    }
-    return decimal.toString(); // Return decimal string
-}
-
-function fetchIPInfo() {
-    fetch("https://api.ipify.org?format=json")
-        .then(r => r.json())
-        .then(ipData => {
-            const ip = ipData.ip;
-            const isIPv6 = ip.includes(":");
-            updateIPDisplay(ip, isIPv6);
-        })
-        .catch(err => {
-            console.error("Failed to fetch IP data:", err);
-            ipResult.textContent = "Unavailable";
-            ipType.textContent = "Unknown";
-            ispResult.textContent = "N/A";
-            locationResult.textContent = "Unknown";
-        });
-}
-
-function updateIPDisplay(ip, isIPv6) {
-    let displayIP = ip;
-    if (isIPv6) {
-        displayIP = ipv6ToDecimal(ip);
-    }
-    ipResult.textContent = displayIP;
-    ipType.textContent = isIPv6 ? "IPv6 (Decimal)" : "IPv4";
-    const ipBadge = ipType.nextElementSibling;
-    if (ipBadge) {
-        ipBadge.className = `badge ${isIPv6 ? 'status-ipv6' : 'status-ipv4'}`;
-        ipBadge.textContent = isIPv6 ? 'IPv6' : 'IPv4';
-    }
-    fetch(`https://ipapi.co/${ip}/json/`)
-        .then(r => r.json())
-        .then(data => {
-            ispResult.textContent = data.org || "N/A";
-            locationResult.textContent = `${data.city || "Unknown"}, ${data.country_name || "Unknown"}`;
-        })
-        .catch(err => console.error("Failed to fetch location data:", err));
-}
-
-async function testComplete() {
-    testInProgress = false;
-    testPhase = 'idle';
-    controlBtn.innerHTML = '<i class="fas fa-play"></i>';
-    progressText.textContent = 'Test complete!';
-
-    // Get DOM elements
-    const testTime = document.getElementById("test-time");
-    const serverResult = document.getElementById("server-result");
-
-    // Set time
-    const now = new Date();
-    testTime.textContent = now.toLocaleString();
-
-    // Set server (static or dynamically later)
-    serverResult.textContent = "Frankfurt, Germany";
-
-    // Fetch IP, ISP, and location
-    try {
-        const res = await fetch("https://api.ipify.org?format=json");
-        const ipData = await res.json();
-        const ip = ipData.ip;
-        const isIPv6 = ip.includes(":");
-        updateIPDisplay(ip, isIPv6);
-    } catch (error) {
-        console.error("Failed to fetch IP data:", error);
-        document.getElementById("ip-result").textContent = "Unavailable";
-        document.getElementById("isp-result").textContent = "N/A";
-        document.getElementById("location-result").textContent = "Unknown";
-        document.getElementById("ip-type").textContent = "Unknown";
-    }
-
-    showResults();
-}
-
-        function showResults() {
-            results.classList.remove('hidden');
-
-            const speedometerContainer = document.querySelector('.speedometer-container');
-            if (speedometerContainer) {
-                speedometerContainer.style.display = 'none';
-            }
-
-            // Hide the live display
-            const liveDisplay = document.querySelector('.live-display');
-            if (liveDisplay) {
-                liveDisplay.style.display = 'none';
-            }
-
-            const oldBtn = document.getElementById('start-again-btn');
-            if (oldBtn) oldBtn.remove('hidden');
-
-            const startAgainBtn = document.createElement('button');
-            startAgainBtn.id = 'start-again-btn';
-            startAgainBtn.innerHTML = '<i class="fas fa-redo-alt"></i>';
-            startAgainBtn.className = 'btn btn-primary mt-3 mx-auto block';
-            results.appendChild(startAgainBtn);
-
-            startAgainBtn.addEventListener('click', () => {
-                results.classList.add('hidden');
-                if (speedometerContainer) {
-                    speedometerContainer.style.display = 'block';
-                }
-                if (liveDisplay) {
-                    liveDisplay.style.display = 'block';
-                }
-                startTest();
-            });
-        }
-
-
-        function updateSpeedometer(speed) {
-            const maxSpeed = 200;
-            const normalizedSpeed = Math.min(speed, maxSpeed) / maxSpeed;
-            const angle = normalizedSpeed * 180;
-            progress.style.transform = `rotate(${angle}deg)`;
-            mask.style.transform = `rotate(${angle}deg)`;
-            speedValue.textContent = speed.toFixed(0);
-            if (Math.abs(speed - parseFloat(speedValue.textContent)) > 5) {
-                speedValue.classList.add('speed-change');
-                setTimeout(() => speedValue.classList.remove('speed-change'), 300);
-            }
-        }
-
-
-
-        function updateQualityIndicator(element, value, thresholds, lowerIsBetter) {
-            const indicator = element.querySelector('.indicator');
-            if (!indicator) return;
-            let qualityClass;
-            if (lowerIsBetter) {
-                if (value <= thresholds[0]) qualityClass = 'excellent';
-                else if (value <= thresholds[1]) qualityClass = 'good';
-                else if (value <= thresholds[2]) qualityClass = 'fair';
-                else qualityClass = 'poor';
-            } else {
-                if (value >= thresholds[2]) qualityClass = 'excellent';
-                else if (value >= thresholds[1]) qualityClass = 'good';
-                else if (value >= thresholds[0]) qualityClass = 'fair';
-                else qualityClass = 'poor';
-            }
-            indicator.className = `indicator indicator-${qualityClass}`;
-        }
-
-        function updatePacketLossQuality(element, value) {
-            const badge = element.querySelector('.badge');
-            if (!badge) return;
-            value = parseFloat(value);
-            let qualityText, qualityClass;
-            if (value === 0) {
-                qualityText = 'Excellent';
-                qualityClass = 'excellent';
-            } else if (value <= 1) {
-                qualityText = 'Good';
-                qualityClass = 'good';
-            } else if (value <= 3) {
-                qualityText = 'Fair';
-                qualityClass = 'fair';
-            } else {
-                qualityText = 'Poor';
-                qualityClass = 'poor';
-            }
-            badge.textContent = qualityText;
-            badge.className = `badge badge-${qualityClass}`;
-        }
-
-        // RAM Test Functionality
-        const startRamTestBtn = document.getElementById('start-ram-test');
-        const ramBar = document.getElementById('ram-bar');
-        const ramUsage = document.getElementById('ram-usage');
-        const ramSpeed = document.getElementById('ram-speed');
-        const totalRam = document.getElementById('total-ram');
-        const ramLatency = document.getElementById('ram-latency');
-
-        startRamTestBtn.addEventListener('click', startRamTest);
-
-        function startRamTest() {
-            startRamTestBtn.disabled = true;
-            startRamTestBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
-            const simulatedTotalRam = Math.floor(Math.random() * 16) + 8;
-            totalRam.textContent = `${simulatedTotalRam} GB`;
-            let progress = 0;
-            let testData = [];
-            const testInterval = setInterval(() => {
-                progress += 0.01;
-                if (progress > 1) progress = 1;
-                ramBar.style.height = `${progress * 100}%`;
-                ramUsage.textContent = `${Math.round(progress * 100)}% Used`;
-                const baseSpeed = 5000 + Math.random() * 15000;
-                const currentSpeed = baseSpeed * (0.5 + progress * 0.5);
-                testData.push(currentSpeed);
-                const baseLatency = 50 + Math.random() * 50;
-                const currentLatency = baseLatency * (1.5 - progress * 0.5);
-                ramSpeed.textContent = `${Math.round(currentSpeed).toLocaleString()} MB/s`;
-                updateQualityIndicator(ramSpeed, currentSpeed, [5000, 15000, 25000], false);
-                ramLatency.textContent = `${Math.round(currentLatency)} ns`;
-                updateQualityIndicator(ramLatency, currentLatency, [50, 100, 150], true);
-                if (progress < 1) {
-                    ramBar.classList.add('ram-pulse');
-                } else {
-                    ramBar.classList.remove('ram-pulse');
-                }
-                if (progress >= 1) {
-                    clearInterval(testInterval);
-                    const avgSpeed = testData.slice(Math.floor(testData.length * 0.3)).reduce((a, b) => a + b, 0) /
-                        (testData.length - Math.floor(testData.length * 0.3));
-                    ramSpeed.textContent = `${Math.round(avgSpeed).toLocaleString()} MB/s`;
-                    updateQualityIndicator(ramSpeed, avgSpeed, [5000, 15000, 25000], false);
-                    startRamTestBtn.disabled = false;
-                    startRamTestBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Run Again';
-                }
-            }, 50);
-        }
-
-        // CPU Test Functionality
-        const startCpuTestBtn = document.getElementById('start-cpu-test');
-        const cpuVisualization = document.getElementById('cpu-visualization');
-        const cpuScore = document.getElementById('cpu-score');
-        const cpuCores = document.getElementById('cpu-cores');
-        const cpuSpeed = document.getElementById('cpu-speed');
-        const cpuThreads = document.getElementById('cpu-threads');
-
-        const simulatedCores = navigator.hardwareConcurrency || Math.floor(Math.random() * 4) + 2;
-        cpuCores.textContent = simulatedCores;
-        cpuThreads.textContent = simulatedCores * 2;
-
-        for (let i = 0; i < simulatedCores; i++) {
-            const core = document.createElement('div');
-            core.className = 'cpu-core';
-            core.id = `cpu-core-${i}`;
-            core.style.left = `${(i / simulatedCores) * 100}%`;
-            core.style.width = `${80 / simulatedCores}%`;
-            const label = document.createElement('div');
-            label.className = 'cpu-core-label';
-            label.textContent = `Core ${i + 1}`;
-            cpuVisualization.appendChild(core);
-            cpuVisualization.appendChild(label);
-        }
-
-        startCpuTestBtn.addEventListener('click', startCpuTest);
-
-        function startCpuTest() {
-            startCpuTestBtn.disabled = true;
-            startCpuTestBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
-            const simulatedSpeed = (1 + Math.random() * 3).toFixed(2);
-            cpuSpeed.textContent = `${simulatedSpeed} GHz`;
-            let progress = 0;
-            let score = 0;
-            const testInterval = setInterval(() => {
-                progress += 0.02;
-                if (progress > 1) progress = 1;
-                for (let i = 0; i < simulatedCores; i++) {
-                    const core = document.getElementById(`cpu-core-${i}`);
-                    const fluctuation = Math.sin(progress * Math.PI * 8 + i) * 0.2 + 0.8;
-                    const coreLoad = Math.min(progress * fluctuation, 1);
-                    core.style.height = `${coreLoad * 100}%`;
-                    if (progress < 1) {
-                        core.classList.add('cpu-bounce');
-                    } else {
-                        core.classList.remove('cpu-bounce');
-                    }
-                }
-                score = Math.min(progress * 10000, 10000);
-                cpuScore.textContent = Math.round(score);
-                if (progress >= 1) {
-                    clearInterval(testInterval);
-                    startCpuTestBtn.disabled = false;
-                    startCpuTestBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Run Again';
-                }
-            }, 50);
-        }
-
-        // GPU Test Functionality
-        const startGpuTestBtn = document.getElementById('start-gpu-test');
-        const gpuCanvas = document.getElementById('gpu-canvas');
-        const fpsCounter = document.getElementById('fps-counter');
-        const gpuScore = document.getElementById('gpu-score');
-        const gpuRenderer = document.getElementById('gpu-renderer');
-        const gpuPerformance = document.getElementById('gpu-performance');
-
-        gpuCanvas.width = gpuCanvas.offsetWidth;
-        gpuCanvas.height = gpuCanvas.offsetHeight;
-        const ctx = gpuCanvas.getContext('2d');
-        const gl = gpuCanvas.getContext('webgl') || gpuCanvas.getContext('experimental-webgl');
-        if (gl) {
-            const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-            gpuRenderer.textContent = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) || "WebGL Compatible" : "WebGL Compatible";
-        } else {
-            gpuRenderer.textContent = "WebGL Not Supported";
-            startGpuTestBtn.disabled = true;
-        }
-
-        startGpuTestBtn.addEventListener('click', startGpuTest);
-
-        let gpuTestRunning = false;
-        let lastTime = 0;
-        let frames = 0;
-        let fps = 0;
-        let gpuTestInterval;
-
-        function startGpuTest() {
-            startGpuTestBtn.disabled = true;
-            startGpuTestBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
-            gpuTestRunning = true;
-            frames = 0;
-            fps = 0;
-            lastTime = performance.now();
-            renderFrame();
-            let score = 0;
-            gpuTestInterval = setInterval(() => {
-                score += fps / 10;
-                gpuScore.textContent = Math.round(score);
-                if (fps > 90) {
-                    gpuPerformance.innerHTML = '<span class="indicator indicator-excellent"></span> Excellent';
-                } else if (fps > 60) {
-                    gpuPerformance.innerHTML = '<span class="indicator indicator-good"></span> Good';
-                } else if (fps > 30) {
-                    gpuPerformance.innerHTML = '<span class="indicator indicator-fair"></span> Fair';
-                } else {
-                    gpuPerformance.innerHTML = '<span class="indicator indicator-poor"></span> Poor';
-                }
-                if (score >= 10000) {
-                    stopGpuTest();
-                }
-            }, 100);
-            setTimeout(() => {
-                if (gpuTestRunning) stopGpuTest();
-            }, 15000);
-        }
-
-        function stopGpuTest() {
-            gpuTestRunning = false;
-            clearInterval(gpuTestInterval);
-            startGpuTestBtn.disabled = false;
-            startGpuTestBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Run Again';
-            ctx.clearRect(0, 0, gpuCanvas.width, gpuCanvas.height);
-        }
-
-        function renderFrame() {
-            if (!gpuTestRunning) return;
-            const now = performance.now();
-            frames++;
-            if (now >= lastTime + 1000) {
-                fps = Math.round((frames * 1000) / (now - lastTime));
-                fpsCounter.textContent = `${fps} FPS`;
-                lastTime = now;
-                frames = 0;
-            }
-            const time = now / 1000;
-            const width = gpuCanvas.width;
-            const height = gpuCanvas.height;
-            ctx.fillStyle = 'black';
-            ctx.fillRect(0, 0, width, height);
-            for (let i = 0; i < 100; i++) {
-                const x = width / 2 + Math.sin(time + i * 0.2) * width * 0.4;
-                const y = height / 2 + Math.cos(time * 0.7 + i * 0.1) * height * 0.4;
-                const size = 10 + Math.sin(time * 1.3 + i) * 8;
-                const hue = (time * 20 + i * 10) % 360;
-                ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
-                ctx.beginPath();
-                ctx.arc(x, y, size, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = `hsl(${hue}, 100%, 50%)`;
-            }
-            requestAnimationFrame(renderFrame);
-        }
-    
-      
-    </script>
-
-  <script type="module">
+    <script type="module">
+  // --- Real speed test via M-Lab ndt7 (no backend needed) ---
   import { runDownload, runUpload } from "https://cdn.jsdelivr.net/npm/@m-lab/ndt7@0.11.0/dist/ndt7.min.js";
 
-  async function test() {
-    const dl = await runDownload({ userAcceptedDataPolicy: true });
-    const ul = await runUpload({ userAcceptedDataPolicy: true });
-    // dl.Mbps and ul.Mbps are the measured speeds (approx).
-    document.getElementById('down').textContent = dl.Mbps.toFixed(2) + " Mbps";
-    document.getElementById('up').textContent   = ul.Mbps.toFixed(2) + " Mbps";
-    // Optional: dl.MinRTT, jitter estimates, logs, etc. are available too.
+  // ------------- DOM refs (existing IDs from your HTML) -------------
+  // nav
+  const homeLink = document.getElementById('home-link');
+  const navSpeed = document.getElementById('nav-speed');
+  const navRam   = document.getElementById('nav-ram');
+  const navCpu   = document.getElementById('nav-cpu');
+  const navGpu   = document.getElementById('nav-gpu');
+  const footerSpeed = document.getElementById('footer-speed');
+  const footerRam   = document.getElementById('footer-ram');
+  const footerCpu   = document.getElementById('footer-cpu');
+  const footerGpu   = document.getElementById('footer-gpu');
+
+  // sections
+  const speedTestSection     = document.getElementById('speed-test-section');
+  const hardwareTestsSection = document.getElementById('hardware-tests-section');
+
+  // tabs inside hardware tests
+  const ramTestBtn = document.getElementById('ram-test-btn');
+  const cpuTestBtn = document.getElementById('cpu-test-btn');
+  const gpuTestBtn = document.getElementById('gpu-test-btn');
+  const ramTestContainer = document.getElementById('ram-test-container');
+  const cpuTestContainer = document.getElementById('cpu-test-container');
+  const gpuTestContainer = document.getElementById('gpu-test-container');
+
+  // speed test UI
+  const controlBtn   = document.getElementById('control-btn');
+  const liveSpeed    = document.getElementById('live-speed');
+  const speedValue   = document.getElementById('speed-value');
+  const unit         = document.getElementById('unit');
+  const liveUnit     = document.getElementById('live-unit');
+  const progressArc  = document.getElementById('progress');
+  const maskArc      = document.getElementById('mask');
+  const progressText = document.getElementById('progress-text');
+  const results      = document.getElementById('results');
+
+  const downloadResult   = document.getElementById('download-result');
+  const uploadResult     = document.getElementById('upload-result');
+  const pingResult       = document.getElementById('ping-result');
+  const jitterResult     = document.getElementById('jitter-result');
+  const loadLatencyResult= document.getElementById('load-latency-result');
+  const packetLossResult = document.getElementById('packet-loss-result'); // we don't measure; leave "0%" or "—"
+  const ipResult         = document.getElementById('ip-result');
+  const ipType           = document.getElementById('ip-type');
+  const ispResult        = document.getElementById('isp-result');
+  const locationResult   = document.getElementById('location-result');
+  const serverResult     = document.getElementById('server-result');
+  const connectionTypeEl = document.getElementById('connection-type');
+  const testTimeEl       = document.getElementById('test-time');
+
+  // ------------- Navigation -------------
+  function showSpeedTest() {
+    speedTestSection.style.display = 'block';
+    hardwareTestsSection.style.display = 'none';
+    document.title = "Network Performance Analyzer";
   }
-  test();
+  function showHardwareTests() {
+    speedTestSection.style.display = 'none';
+    hardwareTestsSection.style.display = 'block';
+    document.title = "Hardware Performance Tests";
+  }
+  function showRamTest() {
+    ramTestBtn.classList.add('active');
+    cpuTestBtn.classList.remove('active');
+    gpuTestBtn.classList.remove('active');
+    ramTestContainer.classList.add('active');
+    cpuTestContainer.classList.remove('active');
+    gpuTestContainer.classList.remove('active');
+  }
+  function showCpuTest() {
+    ramTestBtn.classList.remove('active');
+    cpuTestBtn.classList.add('active');
+    gpuTestBtn.classList.remove('active');
+    ramTestContainer.classList.remove('active');
+    cpuTestContainer.classList.add('active');
+    gpuTestContainer.classList.remove('active');
+  }
+  function showGpuTest() {
+    ramTestBtn.classList.remove('active');
+    cpuTestBtn.classList.remove('active');
+    gpuTestBtn.classList.add('active');
+    ramTestContainer.classList.remove('active');
+    cpuTestContainer.classList.remove('active');
+    gpuTestContainer.classList.add('active');
+  }
+
+  [homeLink, navSpeed, footerSpeed].forEach(el => el?.addEventListener('click', (e)=>{ e.preventDefault(); showSpeedTest(); }));
+  [navRam, footerRam].forEach(el => el?.addEventListener('click', (e)=>{ e.preventDefault(); showHardwareTests(); showRamTest(); }));
+  [navCpu, footerCpu].forEach(el => el?.addEventListener('click', (e)=>{ e.preventDefault(); showHardwareTests(); showCpuTest(); }));
+  [navGpu, footerGpu].forEach(el => el?.addEventListener('click', (e)=>{ e.preventDefault(); showHardwareTests(); showGpuTest(); }));
+  ramTestBtn?.addEventListener('click', showRamTest);
+  cpuTestBtn?.addEventListener('click', showCpuTest);
+  gpuTestBtn?.addEventListener('click', showGpuTest);
+
+  showSpeedTest();
+  showRamTest();
+
+  // ------------- Connection meta -------------
+  connectionTypeEl.textContent = (navigator.connection?.effectiveType) || "Unknown";
+
+  // ------------- IP / ISP / Location -------------
+  async function fetchIPInfo() {
+    try {
+      const ipRes = await fetch("https://api.ipify.org?format=json");
+      const { ip } = await ipRes.json();
+      const isIPv6 = ip.includes(":");
+      updateIPDisplay(ip, isIPv6);
+
+      const locRes = await fetch(`https://ipapi.co/${ip}/json/`);
+      const data = await locRes.json();
+      ispResult.textContent = data.org || "N/A";
+      locationResult.textContent = `${data.city || "Unknown"}, ${data.country_name || "Unknown"}`;
+    } catch (e) {
+      ipResult.textContent = "Unavailable";
+      ipType.textContent = "Unknown";
+      ispResult.textContent = "N/A";
+      locationResult.textContent = "Unknown";
+    }
+  }
+  function ipv6ToDecimal(ipv6) {
+    const expanded = ipv6.includes("::")
+      ? (() => {
+          const [left, right=""] = ipv6.split("::");
+          const l = left ? left.split(":") : [];
+          const r = right ? right.split(":") : [];
+          const missing = 8 - (l.length + r.length);
+          return [...l, ...Array(missing).fill("0"), ...r].join(":");
+        })()
+      : ipv6;
+    const parts = expanded.split(":").map(h => parseInt(h || "0", 16));
+    let dec = BigInt(0);
+    for (const p of parts) dec = dec * BigInt(0x10000) + BigInt(p);
+    return dec.toString();
+  }
+  function updateIPDisplay(ip, isIPv6) {
+    ipResult.textContent = isIPv6 ? ipv6ToDecimal(ip) : ip;
+    ipType.textContent = isIPv6 ? "IPv6 (Decimal)" : "IPv4";
+    const badge = ipType.nextElementSibling;
+    if (badge) {
+      badge.className = `badge ${isIPv6 ? 'status-ipv6' : 'status-ipv4'}`;
+      badge.textContent = isIPv6 ? 'IPv6' : 'IPv4';
+    }
+  }
+  fetchIPInfo();
+
+  // ------------- Speedometer helper -------------
+  function updateSpeedometer(speedMbps) {
+    const max = 200; // adjust if you want a different scale
+    const clamped = Math.max(0, Math.min(speedMbps, max));
+    const angle = (clamped / max) * 180;
+    progressArc.style.transform = `rotate(${angle}deg)`;
+    maskArc.style.transform = `rotate(${angle}deg)`;
+    speedValue.textContent = clamped.toFixed(0);
+  }
+
+  // ------------- Progress bar (download/upload) -------------
+  function ensureProgressBar() {
+    if (document.getElementById('progress-bar-wrapper')) return;
+    const wrapper = document.createElement('div');
+    wrapper.id = 'progress-bar-wrapper';
+    wrapper.style.width = '100%';
+    wrapper.style.display = 'flex';
+    wrapper.style.justifyContent = 'center';
+    wrapper.style.margin = '12px 0';
+    wrapper.style.height = '10px';
+
+    const container = document.createElement('div');
+    container.id = 'progress-bar-container';
+    container.style.width = '50%';
+    container.style.height = '100%';
+    container.style.background = '#e0e0e0';
+    container.style.borderRadius = '5px';
+    container.style.overflow = 'hidden';
+
+    const bar = document.createElement('div');
+    bar.id = 'progress-bar';
+    bar.style.width = '0%';
+    bar.style.height = '100%';
+    bar.style.background = '#4cafef'; // blue for download; we change to green for upload
+    bar.style.transition = 'width 0.1s linear, background 0.3s';
+
+    container.appendChild(bar);
+    wrapper.appendChild(container);
+    progressText.parentNode.insertBefore(wrapper, progressText.nextSibling);
+  }
+  function setProgress(pct01) {
+    const bar = document.getElementById('progress-bar');
+    if (bar) bar.style.width = `${Math.max(0, Math.min(1, pct01))*100}%`;
+  }
+  function removeProgressBar() {
+    const wrap = document.getElementById('progress-bar-wrapper');
+    if (wrap) wrap.remove();
+  }
+
+  // ------------- Quality indicator (reuses your badges) -------------
+  function updateQualityIndicator(element, value, thresholds, lowerIsBetter) {
+    const indicator = element?.querySelector('.indicator');
+    if (!indicator || typeof value !== 'number' || Number.isNaN(value)) return;
+    let qualityClass;
+    if (lowerIsBetter) {
+      if (value <= thresholds[0]) qualityClass = 'excellent';
+      else if (value <= thresholds[1]) qualityClass = 'good';
+      else if (value <= thresholds[2]) qualityClass = 'fair';
+      else qualityClass = 'poor';
+    } else {
+      if (value >= thresholds[2]) qualityClass = 'excellent';
+      else if (value >= thresholds[1]) qualityClass = 'good';
+      else if (value >= thresholds[0]) qualityClass = 'fair';
+      else qualityClass = 'poor';
+    }
+    indicator.className = `indicator indicator-${qualityClass}`;
+  }
+
+  // ------------- Real Test Controller -------------
+  let running = false;
+
+  controlBtn.addEventListener('click', async () => {
+    if (running) return;
+    running = true;
+    controlBtn.innerHTML = '<i class="fas fa-stop"></i>';
+    results.classList.add('hidden');
+    liveSpeed.textContent = '0';
+    updateSpeedometer(0);
+    packetLossResult.textContent = '—'; // ndt7 does not provide packet loss directly
+
+    // meta
+    const now = new Date();
+    testTimeEl.textContent = now.toLocaleString();
+    serverResult.textContent = "M-Lab ndt7 (closest site)";
+
+    ensureProgressBar();
+    setProgress(0);
+    progressText.textContent = 'Testing download…';
+
+    const rtts = []; // collect MinRTT samples across phases (ms)
+
+    try {
+      // -------- DOWNLOAD --------
+      const t0 = performance.now();
+      const dl = await runDownload({
+        userAcceptedDataPolicy: true,
+        onDownloadMeasurement: (m) => {
+          // m.Mbps is instantaneous estimate
+          if (m?.Mbps != null) {
+            liveSpeed.textContent = m.Mbps.toFixed(1);
+            updateSpeedometer(m.Mbps);
+          }
+          if (m?.MinRTT != null) rtts.push(m.MinRTT);
+          const elapsed = performance.now() - t0;
+          // 8 seconds nominal; progress is approximate for UX
+          setProgress(Math.min(1, elapsed / 8000));
+        }
+      });
+      downloadResult.textContent = dl.Mbps.toFixed(1);
+      updateQualityIndicator(downloadResult, dl.Mbps, [10, 25, 50], false);
+      if (dl?.MinRTT != null) {
+        pingResult.textContent = dl.MinRTT.toFixed(1);
+        updateQualityIndicator(pingResult, dl.MinRTT, [20, 50, 100], true);
+      }
+
+      // -------- UPLOAD --------
+      const bar = document.getElementById('progress-bar');
+      if (bar) bar.style.background = '#4caf50'; // green for upload
+      progressText.textContent = 'Testing upload…';
+      const t1 = performance.now();
+      const ul = await runUpload({
+        userAcceptedDataPolicy: true,
+        onUploadMeasurement: (m) => {
+          if (m?.Mbps != null) {
+            liveSpeed.textContent = m.Mbps.toFixed(1);
+            updateSpeedometer(m.Mbps);
+          }
+          if (m?.MinRTT != null) rtts.push(m.MinRTT);
+          const elapsed = performance.now() - t1;
+          setProgress(Math.min(1, elapsed / 8000));
+        }
+      });
+      uploadResult.textContent = ul.Mbps.toFixed(1);
+      updateQualityIndicator(uploadResult, ul.Mbps, [5, 15, 30], false);
+
+      // -------- JITTER (rough MAD over MinRTT samples) --------
+      if (rtts.length >= 2) {
+        const mean = rtts.reduce((a,b)=>a+b,0) / rtts.length;
+        const mad  = rtts.map(v=>Math.abs(v-mean)).reduce((a,b)=>a+b,0) / rtts.length;
+        jitterResult.textContent = mad.toFixed(1);
+        updateQualityIndicator(jitterResult, mad, [5, 15, 30], true);
+      } else {
+        jitterResult.textContent = '—';
+      }
+
+      // A simple load-latency hint = last known MinRTT (if present)
+      const lastRTT = rtts.at(-1);
+      loadLatencyResult.textContent = (typeof lastRTT === 'number') ? `${lastRTT.toFixed(1)} ms` : '—';
+
+      progressText.textContent = 'Test complete!';
+      removeProgressBar();
+
+      // Show results panel + start-again button
+      showResults();
+    } catch (err) {
+      console.error(err);
+      progressText.textContent = 'Test failed. Please try again.';
+      removeProgressBar();
+      controlBtn.innerHTML = '<i class="fas fa-play"></i>';
+    } finally {
+      running = false;
+      liveSpeed.textContent = '0';
+      updateSpeedometer(0);
+      controlBtn.innerHTML = '<i class="fas fa-play"></i>';
+    }
+  });
+
+  function showResults() {
+    results.classList.remove('hidden');
+
+    const speedometerContainer = document.querySelector('.speedometer-container');
+    const liveDisplay         = document.querySelector('.live-display');
+    if (speedometerContainer) speedometerContainer.style.display = 'none';
+    if (liveDisplay)          liveDisplay.style.display = 'none';
+
+    const oldBtn = document.getElementById('start-again-btn');
+    if (oldBtn) oldBtn.remove();
+
+    const startAgainBtn = document.createElement('button');
+    startAgainBtn.id = 'start-again-btn';
+    startAgainBtn.innerHTML = '<i class="fas fa-redo-alt"></i>';
+    startAgainBtn.className = 'btn btn-primary mt-3 mx-auto block';
+    results.appendChild(startAgainBtn);
+
+    startAgainBtn.addEventListener('click', () => {
+      results.classList.add('hidden');
+      if (speedometerContainer) speedometerContainer.style.display = 'block';
+      const liveDisplay2 = document.querySelector('.live-display');
+      if (liveDisplay2) liveDisplay2.style.display = 'block';
+      // user will press Play again to start a new test
+    });
+  }
+
+  // ------------- Hardware tests (keep your visual simulators) -------------
+  // RAM
+  const startRamTestBtn = document.getElementById('start-ram-test');
+  const ramBar = document.getElementById('ram-bar');
+  const ramUsage = document.getElementById('ram-usage');
+  const ramSpeed = document.getElementById('ram-speed');
+  const totalRam = document.getElementById('total-ram');
+  const ramLatency = document.getElementById('ram-latency');
+  startRamTestBtn?.addEventListener('click', () => {
+    startRamTestBtn.disabled = true;
+    startRamTestBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
+    const simulatedTotalRam = Math.floor(Math.random() * 16) + 8;
+    totalRam.textContent = `${simulatedTotalRam} GB`;
+    let p = 0;
+    const samples = [];
+    const it = setInterval(() => {
+      p = Math.min(1, p + 0.01);
+      ramBar.style.height = `${p*100}%`;
+      ramUsage.textContent = `${Math.round(p*100)}% Used`;
+      const curSpeed = (5000 + Math.random()*15000) * (0.5 + p*0.5);
+      samples.push(curSpeed);
+      const curLat = (50 + Math.random()*50) * (1.5 - p*0.5);
+      ramSpeed.textContent = `${Math.round(curSpeed).toLocaleString()} MB/s`;
+      ramLatency.textContent = `${Math.round(curLat)} ns`;
+      if (p >= 1) {
+        clearInterval(it);
+        const discard = Math.floor(samples.length*0.3);
+        const avg = samples.slice(discard).reduce((a,b)=>a+b,0) / (samples.length-discard);
+        ramSpeed.textContent = `${Math.round(avg).toLocaleString()} MB/s`;
+        startRamTestBtn.disabled = false;
+        startRamTestBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Run Again';
+      }
+    }, 50);
+  });
+
+  // CPU
+  const startCpuTestBtn = document.getElementById('start-cpu-test');
+  const cpuVisualization = document.getElementById('cpu-visualization');
+  const cpuScore = document.getElementById('cpu-score');
+  const cpuCores = document.getElementById('cpu-cores');
+  const cpuSpeed = document.getElementById('cpu-speed');
+  const cpuThreads = document.getElementById('cpu-threads');
+
+  const cores = navigator.hardwareConcurrency || Math.floor(Math.random() * 4) + 2;
+  if (cpuCores) cpuCores.textContent = cores;
+  if (cpuThreads) cpuThreads.textContent = cores * 2;
+
+  for (let i = 0; i < cores; i++) {
+    const core = document.createElement('div');
+    core.className = 'cpu-core';
+    core.id = `cpu-core-${i}`;
+    core.style.left = `${(i / cores) * 100}%`;
+    core.style.width = `${80 / cores}%`;
+    const label = document.createElement('div');
+    label.className = 'cpu-core-label';
+    label.textContent = `Core ${i + 1}`;
+    cpuVisualization?.appendChild(core);
+    cpuVisualization?.appendChild(label);
+  }
+
+  startCpuTestBtn?.addEventListener('click', () => {
+    startCpuTestBtn.disabled = true;
+    startCpuTestBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
+    const simulatedGHz = (1 + Math.random() * 3).toFixed(2);
+    cpuSpeed.textContent = `${simulatedGHz} GHz`;
+    let p = 0, score = 0;
+    const it = setInterval(() => {
+      p = Math.min(1, p + 0.02);
+      for (let i = 0; i < cores; i++) {
+        const core = document.getElementById(`cpu-core-${i}`);
+        const fluct = Math.sin(p * Math.PI * 8 + i) * 0.2 + 0.8;
+        const load = Math.min(p * fluct, 1);
+        if (core) core.style.height = `${load*100}%`;
+        if (p < 1) core?.classList.add('cpu-bounce'); else core?.classList.remove('cpu-bounce');
+      }
+      score = Math.min(p * 10000, 10000);
+      cpuScore.textContent = Math.round(score);
+      if (p >= 1) {
+        clearInterval(it);
+        startCpuTestBtn.disabled = false;
+        startCpuTestBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Run Again';
+      }
+    }, 50);
+  });
+
+  // GPU
+  const startGpuTestBtn = document.getElementById('start-gpu-test');
+  const gpuCanvas = document.getElementById('gpu-canvas');
+  const fpsCounter = document.getElementById('fps-counter');
+  const gpuScore = document.getElementById('gpu-score');
+  const gpuRenderer = document.getElementById('gpu-renderer');
+  const gpuPerformance = document.getElementById('gpu-performance');
+
+  if (gpuCanvas) {
+    gpuCanvas.width = gpuCanvas.offsetWidth;
+    gpuCanvas.height = gpuCanvas.offsetHeight;
+  }
+  const ctx = gpuCanvas?.getContext('2d');
+  const gl = gpuCanvas ? (gpuCanvas.getContext('webgl') || gpuCanvas.getContext('experimental-webgl')) : null;
+  if (gl) {
+    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+    gpuRenderer.textContent = debugInfo ? (gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) || "WebGL Compatible") : "WebGL Compatible";
+  } else {
+    gpuRenderer.textContent = "WebGL Not Supported";
+    if (startGpuTestBtn) startGpuTestBtn.disabled = true;
+  }
+
+  let gpuTestRunning = false, lastTime = 0, frames = 0, fps = 0, gpuIt;
+  startGpuTestBtn?.addEventListener('click', () => {
+    if (!ctx) return;
+    startGpuTestBtn.disabled = true;
+    startGpuTestBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
+    gpuTestRunning = true; frames = 0; fps = 0; lastTime = performance.now();
+    renderFrame();
+    let score = 0;
+    gpuIt = setInterval(() => {
+      score += fps / 10;
+      gpuScore.textContent = Math.round(score);
+      if (fps > 90)      gpuPerformance.innerHTML = '<span class="indicator indicator-excellent"></span> Excellent';
+      else if (fps > 60) gpuPerformance.innerHTML = '<span class="indicator indicator-good"></span> Good';
+      else if (fps > 30) gpuPerformance.innerHTML = '<span class="indicator indicator-fair"></span> Fair';
+      else               gpuPerformance.innerHTML = '<span class="indicator indicator-poor"></span> Poor';
+      if (score >= 10000) stopGpuTest();
+    }, 100);
+    setTimeout(()=>{ if (gpuTestRunning) stopGpuTest(); }, 15000);
+  });
+
+  function stopGpuTest() {
+    gpuTestRunning = false;
+    clearInterval(gpuIt);
+    startGpuTestBtn.disabled = false;
+    startGpuTestBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Run Again';
+    ctx?.clearRect(0, 0, gpuCanvas.width, gpuCanvas.height);
+  }
+  function renderFrame() {
+    if (!gpuTestRunning || !ctx) return;
+    const now = performance.now();
+    frames++;
+    if (now >= lastTime + 1000) {
+      fps = Math.round((frames * 1000) / (now - lastTime));
+      fpsCounter.textContent = `${fps} FPS`;
+      lastTime = now; frames = 0;
+    }
+    const t = now / 1000, w = gpuCanvas.width, h = gpuCanvas.height;
+    ctx.fillStyle = 'black'; ctx.fillRect(0, 0, w, h);
+    for (let i = 0; i < 100; i++) {
+      const x = w/2 + Math.sin(t + i*0.2) * w*0.4;
+      const y = h/2 + Math.cos(t*0.7 + i*0.1) * h*0.4;
+      const size = 10 + Math.sin(t*1.3 + i) * 8;
+      const hue = (t*20 + i*10) % 360;
+      ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
+      ctx.beginPath(); ctx.arc(x, y, size, 0, Math.PI*2); ctx.fill();
+      ctx.shadowBlur = 15; ctx.shadowColor = `hsl(${hue}, 100%, 50%)`;
+    }
+    requestAnimationFrame(renderFrame);
+  }
 </script>
 
-<div>Download: <span id="down">…</span></div>
-<div>Upload: <span id="up">…</span></div>
 
   
 </body>
